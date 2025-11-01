@@ -104,9 +104,9 @@ def chunk_generator(filename, chunksize):
         for idx, chunk in enumerate(reader):
             yield (idx, chunk)
 
-filename_1="./train_data_54kandon.csv"
+filename_1="./train_data.csv"
 filename_2="./rna_pdb_dataset.csv"
-output_file="./train_vs_rnapdb_matches_alignment_54kandon.csv"
+output_file="./train_vs_rnapdb_matches_alignment.csv"
 
 max_len_rnapdb=470 # max_len_global
 CHUNKSIZE = 10**3  # 1,000 rows per chunk (adjust as needed)
