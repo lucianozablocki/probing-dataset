@@ -3,6 +3,7 @@ from typing import DefaultDict, Dict, Iterable, Iterator, List, Optional, Sequen
 from Bio import pairwise2
 from multiprocessing import Pool, cpu_count
 import os
+import logging
 
 Match = 1
 Mismatch = -2
@@ -27,6 +28,17 @@ def normalize_sequence(raw: Optional[str]) -> str:
     cleaned = ''.join(raw.split()).upper()
     return cleaned
 
+# Configure logging to write to a single file (filename can be set via FMS_LOG_FILE env var)
+LOG_FILE = os.environ.get("FMS_LOG_FILE", "find_matching_seqs.log")
+logging.basicConfig(
+    level=logging.INFO,
+    filename=LOG_FILE,
+    filemode='a',
+    format="%(asctime)s [%(processName)s] %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
+
 # Global variable for worker processes to access PDB data
 _pdb_data = None
 _max_len_rnapdb = None
@@ -36,13 +48,13 @@ def init_worker(pdb_file, max_len):
     global _pdb_data, _max_len_rnapdb
     _pdb_data = pd.read_csv(pdb_file)
     _max_len_rnapdb = max_len
-    print(f"Worker initialized with {len(_pdb_data)} PDB sequences", flush=True)
+    logger.info(f"Worker initialized with {len(_pdb_data)} PDB sequences")
 
 def process_chunk(args):
     """Process a single chunk against all PDB sequences."""
     chunk_idx, chunk_data = args
     
-    print(f"########## Processing CHUNK NUMBER {chunk_idx} ##########", flush=True)
+    logger.info(f"########## Processing CHUNK NUMBER {chunk_idx} ##########")
     
     results = []
     
@@ -50,23 +62,27 @@ def process_chunk(args):
     seq_counter = 0  # Counter for sequences within this chunk
     
     for idx2, record2 in _pdb_data.iterrows():
-        if idx2 % 10 == 0:
-            print(f"Chunk {chunk_idx}: processing PDB {idx2} of {len(_pdb_data)}", flush=True)
+        if idx2 % 1000 == 0:
+            logger.info(f"Chunk {chunk_idx}: processing PDB {idx2} of {len(_pdb_data)}")
         
         seqB = normalize_sequence(record2['sequence'])
         
         if '&' in seqB:
-            print(f"Chunk {chunk_idx}: skipping pdb seq with id: {record2['pdbid']} due to invalid character &", flush=True)
+            # print(f"Chunk {chunk_idx}: skipping pdb seq with id: {record2['pdbid']} due to invalid character &", flush=True)
             continue
         if len(seqB) > 500 or len(seqB) < 10:
-            print(f"Chunk {chunk_idx}: skipping pdb seq with id: {record2['pdbid']} due to length {len(seqB)}", flush=True)
+            # print(f"Chunk {chunk_idx}: skipping pdb seq with id: {record2['pdbid']} due to length {len(seqB)}", flush=True)
             continue
+        if len(set(seqB)) < 2:
+            logger.warning(f"Chunk {chunk_idx}: skipping pdb seq with id: {record2['pdbid']} due to repeated nucleotides: {seqB}")
         
         for _, record in chunk_data.iterrows():
             seq_counter += 1
             # Log progress periodically, every 10000 sequences
             if seq_counter % 10000 == 0:
-                print(f"Chunk {chunk_idx}: processed {seq_counter} of {total_seqs} train sequences against PDB {record2['pdbid']}", flush=True)
+                logger.info(
+                    f"Chunk {chunk_idx}: processed {seq_counter} of {CHUNKSIZE*6423} train sequences against PDB {record2['pdbid']}"
+                )
             
             seqA = normalize_sequence(record['sequence'])
             
@@ -78,7 +94,10 @@ def process_chunk(args):
             global_IDscore_bymax = equal_nucleotides_count / _max_len_rnapdb
             min_len_local = min(len(seqB), len(seqA))
             local_IDscore_bymin = equal_nucleotides_count / min_len_local
-            if min_len_local >0.5:
+            if (local_IDscore_bymin >0.5) and (abs(len(seqA)-len(seqB))<50):
+                logger.info(
+                    f"found min len local score >0.5 for train seq id: {record['sequence_id']} and pdb id: {record2['pdbid']} at chunk {chunk_idx}"
+                )
                 results.append({
                     "seqA": seqA,
                     "seqB": seqB,
@@ -95,7 +114,7 @@ def process_chunk(args):
                 })
             # print(f"chunk {chunk_idx}: finished analyzing train seq id: {record['sequence_id']}", flush=True)
     
-    print(f"Chunk {chunk_idx}: completed with {len(results)} results", flush=True)
+    logger.info(f"Chunk {chunk_idx}: completed with {len(results)} results")
     return results
 
 def chunk_generator(filename, chunksize):
@@ -109,61 +128,46 @@ filename_2="./rna_pdb_dataset.csv"
 output_file="./train_vs_rnapdb_matches_alignment.csv"
 
 max_len_rnapdb=470 # max_len_global
-CHUNKSIZE = 10**3  # 1,000 rows per chunk (adjust as needed)
+CHUNKSIZE = 10**2  # 100 rows per chunk (adjust as needed)
 
 # Determine number of workers (leave one CPU free for the main process)
 num_workers = max(1, cpu_count() - 1)
-print(f"Using {num_workers} worker processes", flush=True)
-print(f"Using chunksize of {CHUNKSIZE} rows per chunk", flush=True)
+logger.info(f"Using {num_workers} worker processes")
+logger.info(f"Using chunksize of {CHUNKSIZE} rows per chunk")
 
-write_batch_size = 100  # Write results every 100 alignments
 first_write = True  # Set to True to create new file
-results_buffer = []
 chunks_processed = 0
 
 # Process chunks in parallel using a generator (memory efficient)
-print("Starting parallel processing...", flush=True)
-print(f"About to create Pool with {num_workers} workers...", flush=True)
+logger.info("Starting parallel processing...")
+logger.info(f"About to create Pool with {num_workers} workers...")
 
 try:
     with Pool(processes=num_workers, initializer=init_worker, initargs=(filename_2, max_len_rnapdb)) as pool:
-        print("Pool created successfully, starting imap...", flush=True)
+        logger.info("Pool created successfully, starting imap...")
         # imap processes chunks as they're generated, keeping only a few in memory at a time
         # chunksize=1 means submit one chunk at a time to workers
         chunk_iter = chunk_generator(filename_1, CHUNKSIZE)
-        print("Generator created, starting to process chunks...", flush=True)
+        logger.info("Generator created, starting to process chunks...")
         
         for chunk_results in pool.imap(process_chunk, chunk_iter, chunksize=1):
             chunks_processed += 1
-            print(f"Main process: received {len(chunk_results)} results from chunk (total chunks processed: {chunks_processed})", flush=True)
-            
-            # Add results from this chunk to buffer
-            results_buffer.extend(chunk_results)
-            
-            # Write results incrementally
-            if len(results_buffer) >= write_batch_size:
-                print(f"Writing batch of {len(results_buffer)} results to {output_file}...", flush=True)
-                df_batch = pd.DataFrame(results_buffer)
+            logger.info(
+                f"Main process: received {len(chunk_results)} results from chunk (total chunks processed: {chunks_processed})"
+            )
+
+            # Write results for this chunk directly to disk (no intermediate buffer)
+            if chunk_results:
+                logger.info(f"Writing {len(chunk_results)} results from chunk {chunks_processed} to {output_file}...")
+                df_batch = pd.DataFrame(chunk_results)
                 if first_write:
                     df_batch.to_csv(output_file, index=False, mode='w')
                     first_write = False
                 else:
                     df_batch.to_csv(output_file, index=False, mode='a', header=False)
-                results_buffer = []  # Clear the buffer
-                print(f"Batch written successfully", flush=True)
+                logger.info("Chunk written successfully")
 except Exception as e:
-    print(f"ERROR in parallel processing: {e}", flush=True)
-    import traceback
-    traceback.print_exc()
+    logger.exception(f"ERROR in parallel processing: {e}")
     raise
 
-# Write any remaining results
-if results_buffer:
-    print(f"Writing final batch of {len(results_buffer)} results to {output_file}...", flush=True)
-    df_batch = pd.DataFrame(results_buffer)
-    if first_write:
-        df_batch.to_csv(output_file, index=False, mode='w')
-    else:
-        df_batch.to_csv(output_file, index=False, mode='a', header=False)
-
-print(f"Finished writing all results to {output_file}. Total chunks processed: {chunks_processed}")
+logger.info(f"Finished writing all results to {output_file}. Total chunks processed: {chunks_processed}")
