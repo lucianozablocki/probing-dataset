@@ -4,6 +4,7 @@ from Bio import pairwise2
 from multiprocessing import Pool, cpu_count
 import os
 import logging
+import numpy as np
 
 Match = 1
 Mismatch = -2
@@ -62,26 +63,17 @@ def process_chunk(args):
     seq_counter = 0  # Counter for sequences within this chunk
     
     for idx2, record2 in _pdb_data.iterrows():
-        if idx2 % 1000 == 0:
+        if idx2 % 500 == 0:
             logger.info(f"Chunk {chunk_idx}: processing PDB {idx2} of {len(_pdb_data)}")
         
         seqB = normalize_sequence(record2['sequence'])
-        
-        if '&' in seqB:
-            # print(f"Chunk {chunk_idx}: skipping pdb seq with id: {record2['pdbid']} due to invalid character &", flush=True)
-            continue
-        if len(seqB) > 500 or len(seqB) < 10:
-            # print(f"Chunk {chunk_idx}: skipping pdb seq with id: {record2['pdbid']} due to length {len(seqB)}", flush=True)
-            continue
-        if len(set(seqB)) < 2:
-            logger.warning(f"Chunk {chunk_idx}: skipping pdb seq with id: {record2['pdbid']} due to repeated nucleotides: {seqB}")
         
         for _, record in chunk_data.iterrows():
             seq_counter += 1
             # Log progress periodically, every 10000 sequences
             if seq_counter % 10000 == 0:
                 logger.info(
-                    f"Chunk {chunk_idx}: processed {seq_counter} of {CHUNKSIZE*6423} train sequences against PDB {record2['pdbid']}"
+                    f"Chunk {chunk_idx}: processed {seq_counter} of {CHUNKSIZE} train sequences against PDB {record2['pdbid']}"
                 )
             
             seqA = normalize_sequence(record['sequence'])
@@ -89,14 +81,15 @@ def process_chunk(args):
             alignm = pairwise2.align.localds(seqA, seqB, match_dic, GapOpen, GapExtend, one_alignment_only=True)[0]
             equal_nucleotides_count = sum(a == b for a, b in zip(alignm.seqA, alignm.seqB))
             max_len_local = max(len(seqB), len(seqA))
-            #ver distribucion del max len local
             local_IDscore_bymax = equal_nucleotides_count / max_len_local
             global_IDscore_bymax = equal_nucleotides_count / _max_len_rnapdb
-            min_len_local = min(len(seqB), len(seqA))
+            lens_array = [len(seqA), len(seqB)]
+            min_pos = np.argmin(lens_array)
+            min_len_local = lens_array[min_pos]
             local_IDscore_bymin = equal_nucleotides_count / min_len_local
-            if (local_IDscore_bymin >0.5) and (abs(len(seqA)-len(seqB))<50):
+            if (local_IDscore_bymin >=0.5) and ((min_len_local/lens_array[1-min_pos])>=0.2):
                 logger.info(
-                    f"found min len local score >0.5 for train seq id: {record['sequence_id']} and pdb id: {record2['pdbid']} at chunk {chunk_idx}"
+                    f"found min len local score >= 0.5 for train seq id: {record['sequence_id']} and pdb id: {record2['pdbid']} at chunk {chunk_idx}"
                 )
                 results.append({
                     "seqA": seqA,
@@ -124,11 +117,11 @@ def chunk_generator(filename, chunksize):
             yield (idx, chunk)
 
 filename_1="./train_data.csv"
-filename_2="./rna_pdb_dataset.csv"
+filename_2="./sanitized_rnapdbdataset.csv"
 output_file="./train_vs_rnapdb_matches_alignment.csv"
 
 max_len_rnapdb=470 # max_len_global
-CHUNKSIZE = 10**2  # 100 rows per chunk (adjust as needed)
+CHUNKSIZE = 10**3  # 1000 rows per chunk (adjust as needed)
 
 # Determine number of workers (leave one CPU free for the main process)
 num_workers = max(1, cpu_count() - 1)
