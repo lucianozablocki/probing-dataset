@@ -60,7 +60,7 @@ def process_chunk(args):
     results = []
     
     total_seqs = len(chunk_data)
-    seq_counter = 0  # Counter for sequences within this chunk
+    alignm_counter = 0  # Counter for alignments within this chunk
     
     for idx2, record2 in _pdb_data.iterrows():
         if idx2 % 500 == 0:
@@ -69,11 +69,11 @@ def process_chunk(args):
         seqB = normalize_sequence(record2['sequence'])
         
         for _, record in chunk_data.iterrows():
-            seq_counter += 1
-            # Log progress periodically, every 10000 sequences
-            if seq_counter % 10000 == 0:
+            alignm_counter += 1
+            # Log progress periodically, every 400000 alignments
+            if alignm_counter % 400000 == 0:
                 logger.info(
-                    f"Chunk {chunk_idx}: processed {seq_counter} of {CHUNKSIZE} train sequences against PDB {record2['pdbid']}"
+                    f"Chunk {chunk_idx}: processed {alignm_counter} of {CHUNKSIZE*len(_pdb_data)} alignments against PDB {record2['pdbid']}"
                 )
             
             seqA = normalize_sequence(record['sequence'])
@@ -116,7 +116,7 @@ def chunk_generator(filename, chunksize):
         for idx, chunk in enumerate(reader):
             yield (idx, chunk)
 
-filename_1="./train_data.csv"
+filename_1="./train_data_1M114kandon.csv"
 filename_2="./sanitized_rnapdbdataset.csv"
 output_file="./train_vs_rnapdb_matches_alignment.csv"
 
