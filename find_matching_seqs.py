@@ -30,7 +30,7 @@ def normalize_sequence(raw: Optional[str]) -> str:
     return cleaned
 
 # Configure logging to write to a single file (filename can be set via FMS_LOG_FILE env var)
-LOG_FILE = os.environ.get("FMS_LOG_FILE", "find_matching_seqs.log")
+LOG_FILE = os.environ.get("FMS_LOG_FILE", "train_vs_TORNADO.log")
 logging.basicConfig(
     level=logging.INFO,
     filename=LOG_FILE,
@@ -49,7 +49,7 @@ def init_worker(pdb_file, max_len):
     global _pdb_data, _max_len_rnapdb
     _pdb_data = pd.read_csv(pdb_file)
     _max_len_rnapdb = max_len
-    logger.info(f"Worker initialized with {len(_pdb_data)} PDB sequences")
+    logger.info(f"Worker initialized with {len(_pdb_data)} sequences")
 
 def process_chunk(args):
     """Process a single chunk against all PDB sequences."""
@@ -64,7 +64,7 @@ def process_chunk(args):
     
     for idx2, record2 in _pdb_data.iterrows():
         if idx2 % 500 == 0:
-            logger.info(f"Chunk {chunk_idx}: processing PDB {idx2} of {len(_pdb_data)}")
+            logger.info(f"Chunk {chunk_idx}: processing {idx2} of {len(_pdb_data)}")
         
         seqB = normalize_sequence(record2['sequence'])
         
@@ -88,9 +88,9 @@ def process_chunk(args):
             min_len_local = lens_array[min_pos]
             local_IDscore_bymin = equal_nucleotides_count / min_len_local
             if (local_IDscore_bymin >=0.5) and ((min_len_local/lens_array[1-min_pos])>=0.2):
-                logger.info(
-                    f"found min len local score >= 0.5 for train seq id: {record['sequence_id']} and pdb id: {record2['pdbid']} at chunk {chunk_idx}"
-                )
+                # logger.info(
+                #     f"found min len local score >= 0.5 for train seq id: {record['sequence_id']} and pdb id: {record2['pdbid']} at chunk {chunk_idx}"
+                # )
                 results.append({
                     "seqA": seqA,
                     "seqB": seqB,
@@ -98,7 +98,25 @@ def process_chunk(args):
                     "train_sequence_id": record['sequence_id'],
                     "dataset_name": record['dataset_name'],
                     "signal_to_noise": record['signal_to_noise'],
-                    'pdb_id': record2['pdbid'],
+                    'tornado_id': record2['id'],
+                    'global_alignment_score_bymax': global_IDscore_bymax,
+                    'local_alignment_score_bymax': local_IDscore_bymax,
+                    'local_alignment_score_bymin': local_IDscore_bymin,
+                    'alignment_seqA': alignm.seqA,
+                    'alignment_seqB': alignm.seqB
+                })
+            if seqA in seqB or seqB in seqA:
+                logger.info(
+                    f"found substring match for train seq id: {record['sequence_id']} and: {record2['pdbid']} at chunk {chunk_idx}"
+                )
+                results.append({
+                    "seqA": seqA,
+                    "seqB": seqB,
+                    "type": "substring",
+                    "train_sequence_id": record['sequence_id'],
+                    "dataset_name": record['dataset_name'],
+                    "signal_to_noise": record['signal_to_noise'],
+                    'tornado_id': record2['tornado_id'],
                     'global_alignment_score_bymax': global_IDscore_bymax,
                     'local_alignment_score_bymax': local_IDscore_bymax,
                     'local_alignment_score_bymin': local_IDscore_bymin,
@@ -116,9 +134,9 @@ def chunk_generator(filename, chunksize):
         for idx, chunk in enumerate(reader):
             yield (idx, chunk)
 
-filename_1="./train_data_1M114kandon.csv"
-filename_2="./sanitized_rnapdbdataset.csv"
-output_file="./train_vs_rnapdb_matches_alignment.csv"
+filename_1="./train_data.csv"
+filename_2="./TORNADO.csv"
+output_file="./train_vs_TORNADO_matches.csv"
 
 max_len_rnapdb=470 # max_len_global
 CHUNKSIZE = 10**3  # 1000 rows per chunk (adjust as needed)
