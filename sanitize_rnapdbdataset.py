@@ -1,28 +1,33 @@
 import pandas as pd
-df=pd.read_csv("./rna_pdb_dataset.csv")
+df=pd.read_csv("./TORNADO.csv")
 
 results=[]
 seen_seqs=set()
 removed_pdbids=[]
 for index, row in df.iterrows():
-    seq=row['sequence']
+    seq=row['sequence'].lower()
     if seq in seen_seqs:
-        print(f"removing duplicate seq with id {row['pdbid']}", flush=True)
-        removed_pdbids.append((row['pdbid'], "duplicate"))
+        print(f"removing duplicate seq with id {row['id']}", flush=True)
+        removed_pdbids.append((row['id'], "duplicate"))
         continue
     elif len(seq)<20 or len(seq)>500 or '&' in seq:
-        print(f"removing seq with id {row['pdbid']} due to length {len(seq)} or invalid character &", flush=True)
-        removed_pdbids.append((row['pdbid'], "invalid"))
+        print(f"removing seq with id {row['id']} due to length {len(seq)} or invalid character &", flush=True)
+        removed_pdbids.append((row['id'], "invalid"))
     elif len(set(seq))<2:
-        print(f"removing seq with id {row['pdbid']} due to repeated nucleotides: {seq}", flush=True)
-        removed_pdbids.append((row['pdbid'], "repeated nucleotides"))
+        print(f"removing seq with id {row['id']} due to repeated nucleotides: {seq}", flush=True)
+        removed_pdbids.append((row['id'], "repeated nucleotides"))
+    # check that sequence only contains A,C,G,U
+    elif any(c not in 'acgu' for c in seq):
+        print(f"removing seq with id {row['id']} due to invalid characters in sequence: {seq}", flush=True)
+        removed_pdbids.append((row['id'], "invalid characters"))
     else:
-        print(f"{row['pdbid']},{seq}", flush=True)
+        # print(f"{row['id']},{seq}", flush=True)
+        row['sequence']=seq.upper()
         results.append(row)
     seen_seqs.add(seq)
 
 results_df=pd.DataFrame(results)
-results_df.to_csv("./sanitized_rnapdbdataset.csv", index=False)
+results_df.to_csv("./sanitized_TORNADO.csv", index=False)
 
-removed_df=pd.DataFrame(removed_pdbids, columns=['pdbid', 'reason'])
-removed_df.to_csv("./removed_rnapdbdataset.csv", index=False)
+removed_df=pd.DataFrame(removed_pdbids, columns=['id', 'reason'])
+removed_df.to_csv("./removed_TORNADO.csv", index=False)
