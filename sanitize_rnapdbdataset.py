@@ -9,7 +9,6 @@ for index, row in df.iterrows():
     if seq in seen_seqs:
         print(f"removing duplicate seq with id {row['id']}", flush=True)
         removed_pdbids.append((row['id'], "duplicate"))
-        continue
     elif len(seq)<20 or len(seq)>500 or '&' in seq:
         print(f"removing seq with id {row['id']} due to length {len(seq)} or invalid character &", flush=True)
         removed_pdbids.append((row['id'], "invalid"))
