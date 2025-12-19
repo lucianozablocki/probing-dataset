@@ -1,0 +1,7 @@
+name: probing-dataset
+channels:
+  - defaults
+dependencies:
+  - biopython
+  - pandas
+  - pyarrow
