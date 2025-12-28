@@ -53,6 +53,8 @@ for idx, row in df.iterrows():
     # print(f"Row {idx} Reactivities (first 5): {reactivities[50:55]}")
     # print(f"Row {idx} Reactivity Errors (first 5): {reactivity_errors[:5]}")
     result_row=row.to_dict()
+    result_row['reactivity']=reactivity
+    result_row['reactivity_errors']=reactivity_errors
     # result_row['pdb_id']=alignment_row['pdb_id']
     results.append(result_row)
 
