@@ -108,30 +108,39 @@ def compute_alignment_bounds(probing, seqA, seqB):
 
   return alignm, start_alignm, end_alignm, True
 
-def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, start_alignm, end_alignm, early_cut):
+def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds):
+  """
+  Plot probings and pseudo-probing for a given pdb_id.
+  
+  Args:
+    pdb_id: The PDB ID to plot
+    rows_of_pdbid: List of rows containing probing data
+    alignment_bounds: List of (start_alignm, end_alignm) tuples, one per row in rows_of_pdbid
+  """
   plt.figure()
-  # print(len(probing))
-  # print(len(struct))
-  # print(type(struct))
-  # rows=rnagym_seqs[rnagym_seqs['pdb_id']==pdb_id]
   plt.grid()
   struct=rnapdb_dataset[rnapdb_dataset['id']==pdb_id]['base_pairs'].values[0]
   pseudo_probing=[1 if s=="." else 0 for s in list(struct)]
   pseudo_probing=np.array(pseudo_probing)-1.5
 
-  # Calculate match frequency at each position across all rows
-  seq_len = end_alignm - start_alignm - early_cut
-  ref_seq = rows_of_pdbid[0]['alignment_seqB'][start_alignm:end_alignm-early_cut]
+  # Use seqB (reference PDB sequence) length as the global range
+  ref_seq = rows_of_pdbid[0]['seqB']
+  seq_len = len(ref_seq)
 
   # Collect all seqA alignments and compute match frequency per position
   match_counts = [0] * seq_len
   total_seqs = len(rows_of_pdbid)
   for idx, row in enumerate(rows_of_pdbid):
-    # print(row)
-    seqA = row.get('alignment_seqA')#, alignm.seqA[start_alignm:end_alignm-early_cut])  # fallback to alignm param
-    for i, (nB, nA) in enumerate(zip(ref_seq, seqA)):
-      if i < seq_len and nA == nB and nA != '-':
-        match_counts[i] += 1
+    start_alignm, end_alignm = alignment_bounds[idx]
+    seqA = row.get('alignment_seqA')
+    seqB_aligned = row.get('alignment_seqB')
+    # Map aligned positions to seqB positions
+    seqB_pos = 0
+    for align_idx in range(start_alignm, min(end_alignm + 1, len(seqA))):
+      if align_idx < len(seqB_aligned) and seqB_aligned[align_idx] != '-':
+        if seqB_pos < seq_len and seqA[align_idx] == seqB_aligned[align_idx] and seqA[align_idx] != '-':
+          match_counts[seqB_pos] += 1
+        seqB_pos += 1
 
   match_freq = [c / total_seqs if total_seqs > 0 else 0 for c in match_counts]
 
@@ -153,42 +162,61 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, start_alignm, end_ali
     tick_label.set_fontsize(6 + freq * 6)
     # Weight: bold if high match
     tick_label.set_fontweight('bold' if freq > 0.5 else 'normal')
-  plt.xlim(-.2,end_alignm-start_alignm-early_cut)
+  plt.xlim(-.2, seq_len)
 
-  for row in rows_of_pdbid:
-
+  for idx, row in enumerate(rows_of_pdbid):
+    start_alignm, end_alignm = alignment_bounds[idx]
+    
     probing=row['reactivity']
     error=row['reactivity_errors']
+    seqA_aligned = row.get('alignment_seqA')
+    seqB_aligned = row.get('alignment_seqB')
 
-    probing_slice = np.array(probing[start_alignm:end_alignm-early_cut], dtype=float)
+    # Map probing values to seqB positions
+    # start_alignm is where seqB starts in the alignment, so it maps to seqB position 0
+    # We need to track seqA position separately to handle gaps in seqA
+    # Assumption: only seqA can have gaps
+    probing_mapped = []
+    x_positions = []
+    gap_positions = []  # positions where seqA has a gap
+    seqB_pos = 0
+    # Count how many seqA nucleotides appear before start_alignm to get initial seqA_pos
+    seqA_pos = sum(1 for c in seqA_aligned[:start_alignm] if c != '-')
+    
+    for align_idx in range(start_alignm, min(end_alignm + 1, len(seqB_aligned))):
+      if seqA_aligned[align_idx] == '-':
+        # seqA has a gap - mark this position
+        gap_positions.append(seqB_pos)
+      else:
+        # seqA has a nucleotide - use probing value
+        if seqA_pos < len(probing):
+          probing_mapped.append(probing[seqA_pos])
+        x_positions.append(seqB_pos)
+        seqA_pos += 1
+      seqB_pos += 1
+
+    probing_slice = np.array(probing_mapped, dtype=float)
 
     # Find NaN positions (marked as -1000)
     nan_mask = probing_slice == -1000
-    nan_indices = np.where(nan_mask)[0]
+    nan_indices = np.array(x_positions)[nan_mask]
 
     # Replace -1000 with 0 for plotting
     probing_clean = probing_slice.copy()
     probing_clean[nan_mask] = 0
 
     line_color = 'b' if row['experiment_type']=='2A3_MaP' else 'g'
-    plt.plot(probing_clean, color=line_color, alpha=.6)
+    plt.plot(x_positions, probing_clean, color=line_color, alpha=.6)
 
-    # Mark NaN positions with X markers at y=0
-    if len(nan_indices) > 0:
-      plt.scatter(nan_indices, [0] * len(nan_indices), marker='x', s=50,
+    # Mark NaN positions and gap positions with X markers at y=0
+    all_gap_indices = list(nan_indices) + gap_positions
+    if len(all_gap_indices) > 0:
+      plt.scatter(all_gap_indices, [0] * len(all_gap_indices), marker='x', s=50,
                   color=line_color, linewidths=2, zorder=5)
-    # plt.scatter(range(end_alignm-start_alignm-early_cut),error[start_alignm:end_alignm-early_cut])
 
+  plt.plot(pseudo_probing[0:seq_len],color='black')
 
-  # if early_cut:
-    # plt.plot(pseudo_probing[:-early_cut])
-  # else:
-  plt.plot(pseudo_probing[0:end_alignm-start_alignm-early_cut],color='black')
-
-  # plt.plot(range(end_alignm-start_alignm-early_cut),[-1.5]*(end_alignm-start_alignm-early_cut),color='gray', linestyle='dashed',)
-  # plt.legend(['probing','errors','pseudo_probing'])
   plt.title(f'{pdb_id.upper()}')
-  # plt.savefig(f"drive/MyDrive/probing-dataset/rnagym-rnapdb-probing-and-pseudoprobing-figs/{pdb_id}_{experiment_type}_{rnagym_id}.png")
   plt.show()
 
 rnagym_seqs_aligned_with_pdb_id = rnagym_seqs[rnagym_seqs['pdb_id']=='3t4b'].reset_index(drop=True)
@@ -216,7 +244,10 @@ for row in rows_of_pdbid:
   # print(row['sequence_id'])
   compute_alignment_bounds(row['reactivity'], row['sequence'], row['seqB'])
 
+# Collect alignment bounds for each row
+alignment_bounds = []
+for row in rows_of_pdbid:
+  alignm, start_alignm, end_alignm, draw = compute_alignment_bounds(row['reactivity'], row['sequence'], row['seqB'])
+  alignment_bounds.append((start_alignm, end_alignm))
 
-alignm, start_alignm, end_alignm, draw = compute_alignment_bounds(rows_of_pdbid[0]['reactivity'], rows_of_pdbid[0]['sequence'], rows_of_pdbid[0]['seqB'])
-
-plot_probings_and_pseudoprobing('3t4b', rows_of_pdbid, start_alignm, end_alignm, 0)
+plot_probings_and_pseudoprobing('3t4b', rows_of_pdbid, alignment_bounds)
