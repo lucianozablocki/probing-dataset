@@ -126,7 +126,9 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds):
   # Use seqB (reference PDB sequence) length as the global range
   ref_seq = rows_of_pdbid[0]['seqB']
   seq_len = len(ref_seq)
-
+  if len(struct)!=len(ref_seq):
+    print(f"reference struct differs in length for pdb {pdb_id}")
+    return
   # Collect all seqA alignments and compute match frequency per position
   match_counts = [0] * seq_len
   total_seqs = len(rows_of_pdbid)
@@ -166,7 +168,7 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds):
 
   for idx, row in enumerate(rows_of_pdbid):
     start_alignm, end_alignm = alignment_bounds[idx]
-    
+    # print(f"align starts at {start_alignm} and ends at {end_alignm}")
     probing=row['reactivity']
     error=row['reactivity_errors']
     seqA_aligned = row.get('alignment_seqA')
@@ -180,18 +182,17 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds):
     x_positions = []
     gap_positions = []  # positions where seqA has a gap
     seqB_pos = 0
-    # Count how many seqA nucleotides appear before start_alignm to get initial seqA_pos
-    seqA_pos = sum(1 for c in seqA_aligned[:start_alignm] if c != '-')
-    
+    seqA_pos = start_alignm
+
     for align_idx in range(start_alignm, min(end_alignm + 1, len(seqB_aligned))):
       if seqA_aligned[align_idx] == '-':
+        # print(f"gap found at idx {align_idx}")
         # seqA has a gap - mark this position
         gap_positions.append(seqB_pos)
       else:
         # seqA has a nucleotide - use probing value
-        if seqA_pos < len(probing):
-          probing_mapped.append(probing[seqA_pos])
-        x_positions.append(seqB_pos)
+        probing_mapped.append(probing[seqA_pos])
+        x_positions.append(seqB_pos) # positions where we have probing values (no gaps)
         seqA_pos += 1
       seqB_pos += 1
 
@@ -206,7 +207,7 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds):
     probing_clean[nan_mask] = 0
 
     line_color = 'b' if row['experiment_type']=='2A3_MaP' else 'g'
-    plt.plot(x_positions, probing_clean, color=line_color, alpha=.6)
+    plt.plot(x_positions, probing_clean, color=line_color, alpha=.6 if pdb_id_counts[pdb_id]<20 else .2)
 
     # Mark NaN positions and gap positions with X markers at y=0
     all_gap_indices = list(nan_indices) + gap_positions
@@ -217,7 +218,11 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds):
   plt.plot(pseudo_probing[0:seq_len],color='black')
 
   plt.title(f'{pdb_id.upper()}')
-  plt.show()
+  if not (seq_len==len(probing_clean)+len(gap_positions)):
+    print(f"there's probably gaps in seqB for pdb id {pdb_id}, skipping plot")
+  else:
+    plt.savefig(f"/content/drive/MyDrive/probing-dataset/rnagy-rnapdb-overlapped-probing-figs/{pdb_id}.png")
+    plt.show()
 
 rnagym_seqs_aligned_with_pdb_id = rnagym_seqs[rnagym_seqs['pdb_id']=='3t4b'].reset_index(drop=True)
 seen=[]
