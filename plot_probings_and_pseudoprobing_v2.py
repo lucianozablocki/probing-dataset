@@ -25,7 +25,7 @@ for simbolA in simbolos:
             match_dic[(simbolA, simbolB)] = Mismatch
 from Bio import pairwise2
 
-def compute_alignment_bounds(probing, seqA, seqB):
+def compute_alignment_bounds(probing, seqA, seqB, print_seqB=False):
   for idx, p in enumerate(probing):
     # print(p)
     # print(probing[idx+1])
@@ -45,34 +45,12 @@ def compute_alignment_bounds(probing, seqA, seqB):
   min_len_local = lens_array[min_pos]
   equal_nucleotides_count = sum(a == b for a, b in zip(alignm.seqA, alignm.seqB))
   local_IDscore_bymin = equal_nucleotides_count / min_len_local
-  # print(alignm.seqA)
 
-  # print(len(r_list))
-  # print(len(seqA))
-  # print(len(alignm.seqA))
+  # First pass: find start_alignm and end_alignm
   not_start=True
   start_alignm = None
   end_alignm = None
   for idx, (nucleotideA, nucleotideB) in enumerate(zip(alignm.seqA,alignm.seqB)):
-    # print(idx)
-    if nucleotideA==nucleotideB:
-      print(f"{BOLD}{nucleotideA}{RESET}",end="")
-    else:
-      print(f"{nucleotideA}",end="")
-
-    # if nucleotideB!="-" and idx==0 and not_start:
-    #   start_alignm=idx
-    #   not_start=False
-    # elif nucleotideB!="-" and idx==len(alignm.seqB)-1 and not_start==False:
-    #   end_alignm=idx
-    #   not_start=True
-    # elif nucleotideB!="-" and not_start:
-    #   start_alignm=idx
-    #   not_start=False
-    # elif nucleotideB=="-" and not_start==False:
-    #   end_alignm=idx
-    #   not_start=True
-
     if nucleotideB != "-":
       if not_start:
         start_alignm = idx
