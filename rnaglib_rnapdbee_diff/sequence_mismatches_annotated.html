@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sequence mismatches</title>
+<style>
+  body { font-family: monospace; font-size: 14px; padding: 2em; }
+  h1   { font-family: sans-serif; }
+  h3   { font-family: sans-serif; margin-top: 2em; }
+  table { border-collapse: collapse; margin-bottom: 1em; }
+  td, th { padding: 4px 10px; border: 1px solid #ccc; }
+  th { background: #f0f0f0; }
+  .sub { background: #ffe066; font-weight: bold; border-radius: 2px; }
+  .del { background: #ff9999; font-weight: bold; border-radius: 2px; }
+  .ins { background: #99ff99; font-weight: bold; border-radius: 2px; }
+  .legend span { display: inline-block; padding: 2px 8px; border-radius: 3px; margin-right: 8px; }
+</style>
+</head>
+<body>
+<h1>Sequence mismatches: rnaglib (base) vs rnapdbee</h1>
+<p>40 mismatches.</p>
+<p class="legend">
+  Legend:&nbsp;
+  <span class="sub">substitution</span>
+  <span class="del">deletion&nbsp;(extra in rnaglib)</span>
+  <span class="ins">insertion&nbsp;(extra in rnapdbee)</span>
+</p>
+<h3>1. <code>1e8o</code> chain <code>E</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGCCGGGCGCGGUGGCGCGCGCCUGUAGUCCCAGCUACUCGGGAGGCUC</td><td>49</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GGCCGGGCGCGGUGGCGCGCGCCUGUAGUCCCAGCUACUCGGGAGGCUC</td><td>50</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>((((((((((((..[[[.)))))))....((((.]]..]..)))))))))</code></td><td></td></tr>
+</table>
+<h3>2. <code>1l2x</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GCGCGGCACCGUCCGCGGAACAAACGG</td><td>27</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GCGCGGCACCGUCCGCGGAACAAACGG</td><td>28</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>..(((((..[[[.))))).......]]]</code></td><td></td></tr>
+</table>
+<h3>3. <code>1xjr</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GAGUUCACCGAGGCCACGCGGAGUACGAUCGAGGGUACAGUGAAUU</td><td>46</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GAGUUCACCGAGGCCACGCGGAGUACGAUCGAGGGUACAGUGAAUU</td><td>47</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>..(((((((...((((.((((.....))..))..))).).)))))))</code></td><td></td></tr>
+</table>
+<h3>4. <code>1y27</code> chain <code>X</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GAUCAUAUAAUCGCGUGGAUAUGGCACGCAAGUUUCUACCGGGCACCGUAAAUGUCCGACUAUGGUC</td><td>67</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GAUCAUAUAAUCGCGUGGAUAUGGCACGCAAGUUUCUACCGGGCACCGUAAAUGUCCGACUAUGGUC</td><td>68</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>.((((((((..(.(((((.....[[))))).)[.....)]((((((]].....))))))..)))))))</code></td><td></td></tr>
+</table>
+<h3>5. <code>3k1v</code> chain <code>A</code> &mdash; deletion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>AGAGGUUCUAG<span class="del">C</span>CCCUCUAUAAAAAACUAA</td><td>30</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>AGAGGUUCUAGCCCUCUAUAAAAAACUAA</td><td>29</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((...[[[.)))))........]]].</code></td><td></td></tr>
+</table>
+<h3>6. <code>4jf2</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GAACCGCGAAAGCGGUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA</td><td>76</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GAACCGCGAAAGCGGUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA</td><td>77</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>((((((((....))))))))((((((((.......[[[[[..))))))))......((((....))))..]]]]]..</code></td><td></td></tr>
+</table>
+<h3>7. <code>4mgn</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GAAUCAAUAGUAGUUAACCCUCUCUUCCGAAGCGAGCCGGGGGCGGUGGGAGCCCGGUGAAGACGGUUAAUGAAACGGCAGUUCC</td><td>85</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GAAUCAAUAGUAGUUAACCCUCUCUUCCGAAGCGAGCCGGGGGCGGUGGGAGCCCGGUGAAGACGGUUAAUGAAACGGCAGUUCC</td><td>86</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((........(((((((...(((((.....[..((((((..........]))))))))))).))))))).....[[[.)))))</code></td><td></td></tr>
+</table>
+<h3>8. <code>4mgn</code> chain <code>B</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCU</td><td>71</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCU</td><td>72</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((....{..)))).(((((..]]]..))))).....(((((..}....)))))))))))).</code></td><td></td></tr>
+</table>
+<h3>9. <code>4mgn</code> chain <code>D</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCUC</td><td>72</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCUC</td><td>73</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((....{..)))).(((((..]]]..))))).....(((((..}....))))))))))))..</code></td><td></td></tr>
+</table>
+<h3>10. <code>4oqu</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGAUCACGAGGGGGAGACCCCGGCAACCUGGGACGGACACCCAAGGUGCUCACACCGGAGACGGUGGAUCCGGCCCGAGAGGGCAACGAAGGUCCGA</td><td>97</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGAUCACGAGGGGGAGACCCCGGCAACCUGGGACGGACACCCAAGGUGCUCACACCGGAGACGGUGGAUCCGGCCCGAGAGGGCAACGAAGGUCCGA<span class="ins">A</span></td><td>98</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((....((((....))))(((..((((((.[[[[[.))).))).)))..(((((....)))))))))).((((....)))).......]]]]]..</code></td><td></td></tr>
+</table>
+<h3>11. <code>5aox</code> chain <code>C</code> &mdash; deletion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GCCGGGCGCGGUGGCUCACGCCUGUAAUCCCAGCACUUUGGGAGGCCGAGGCGGGAGGAUCGCGAAC<span class="del">AC</span>GCGAGACCCCGUCUCUA</td><td>86</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GCCGGGCGCGGUGGCUCACGCCUGUAAUCCCAGCACUUUGGGAGGCCGAGGCGGGAGGAUCGCGAACGCGAGACCCCGUCUCUA</td><td>85</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((((.(..[[[.).)))))....((((.]].]...))))))))((((((((.(..(((((..)))))..)))))))))..</code></td><td></td></tr>
+</table>
+<h3>12. <code>5axm</code> chain <code>P</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAGAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUCCCCAC</td><td>72</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAGAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUCCCCAC</td><td>73</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>((((((..((((.....[..)))).(((((.......))))).....(((((..]....)))))))))))...</code></td><td></td></tr>
+</table>
+<h3>13. <code>5d5l</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GAAGGCCGAAAGGUCUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA</td><td>76</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GAAGGCCGAAAGGUCUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA</td><td>77</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>((((((((....))))))))((((((((.......[[[[[..))))))))......((((....))))..]]]]]..</code></td><td></td></tr>
+</table>
+<h3>14. <code>5e81</code> chain <code>1K</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGGUCGUUAGCUCAGUGAGAGCAGUUGACUUUAAUCAAUUGUCGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>71</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGGUCGUUAGCUCAGUGAGAGCAGUUGAC<span class="ins">U</span>UUUAAUCAAUUGUCGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>72</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(.(...(..((((...[.)))).(((((...{{..))))).......((..]....))...)...).)..[.</code></td><td></td></tr>
+</table>
+<h3>15. <code>5e81</code> chain <code>1L</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGGUCGUUAGCUCAUGGAGCAGUUGACUUUAAUCAAUUGCGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>68</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGGUCGUUAGCUCAUGGAGCAGUUGAC<span class="ins">U</span>UUUAAUCAAUUGCGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>69</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>((.......((((..{)))).(((((...[[..)))))....(.((..}....)).)......))..{.</code></td><td></td></tr>
+</table>
+<h3>16. <code>5el4</code> chain <code>1K</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGGUCGUUAGCUCAGUGGAGCAGUUGACUUUAAUCAAUUCGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>68</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGGUCGUUAGCUCAGUGGAGCAGUUGAC<span class="ins">U</span>UUUAAUCAAUUCGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>69</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(.(......((.....[..))..((((...{...)))).....(((..]....)))......).)..[.</code></td><td></td></tr>
+</table>
+<h3>17. <code>5ju8</code> chain <code>AY</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGGUGAUUAGCUCAGGGGAGAGCACCUCCCUACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCA</td><td>70</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGGUGAUUAGCUCAGGGGAGAGCACCUCCCU<span class="ins">N</span>ACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCA</td><td>71</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((......)))).(((((...]]..))))).....(((((.......)))))))))))).</code></td><td></td></tr>
+</table>
+<h3>18. <code>5l3p</code> chain <code>y</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GCUGAUAUAGCUCAGUUGGUAGAGCGCACCCUUGGUAGGGUGAGGUCGGCAGUUCGAAUCUGCCUAUCAGCA</td><td>72</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GCUGAUAUAGCUCAGUUGGUAGAGCGCACCCUUGGU<span class="ins">G</span>AGGGUGAGGUCGGCAGUUCGAAUCUGCCUAUCAGCA</td><td>73</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>.(((..(..(((......[...)))..((((.......))))......(((....]......))))..)))..</code></td><td></td></tr>
+</table>
+<h3>19. <code>5ns3</code> chain <code>C</code> &mdash; deletion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>CGCACCUGACCCCAUGCCGAACUCAGA<span class="del">A</span>GUGCG</td><td>33</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>CGCACCUGACCCCAUGCCGAACUCAGAGUGCG</td><td>32</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((((...(.....)...)))).)))))</code></td><td></td></tr>
+</table>
+<h3>20. <code>6cu1</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGUGGCUCACAUUUGUUGCGGGUUCGAGACCCGUCAGAGCGAAAGCUCUGUAGCUCAAUGGUAGAGCGGUGUAGUCACC</td><td>79</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GGUGGCUCACAUUUGUUGCGGGUUCGAGACCCGUCAGAGCGAAAGCUCUGUAGCUCAAUGGUAGAGCGGUGUAGUCACC</td><td>80</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>.(((((((.(((((....(((((..[....)))))((((((....))))))..((((....]..))))))))))))))))</code></td><td></td></tr>
+</table>
+<h3>21. <code>6fz0</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>AGGCGCAUUUGAACUGUAUUGUACGCCUUGCAGCAAAAGUACUAAAAA</td><td>48</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>AGGCGCAUUUGAACUGUAUUGUACGCCUUGCAGCAAAAGUACUAAAAA<span class="ins">A</span></td><td>49</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>[[[[..............((((((]]]]((...))...)))).))....</code></td><td></td></tr>
+</table>
+<h3>22. <code>6mwn</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GCAAACAUCAUUUGGCCUUAAAUGGGAUUCUGUGAGAGGGGAUCCCUCCAUUGACAGCUGGACUGUUCUUUGGGGCCUUAUGUGGUGUUUG</td><td>91</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GCAAACAUCAUUUGGCCUUAAAUGGGAUUCUGUGAGAGGGGAUCCCUCCAUUGACAGCUGGACUGUUCUUUGGGGCCUUAUGUGGUGUUUG</td><td>92</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>..((((((((((..((((......((((((((.......)))))))).(((..(.(((.....)))..)..)))))))....))))))))))</code></td><td></td></tr>
+</table>
+<h3>23. <code>6prv</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>CCAGGAUGUUGGCUUAGAAGCAGCCAUCAUUUAAAGAAAGCGUAAUAGCUCACUGGU</td><td>57</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>CCAGGAUGUUGGCUUAGAAGCAGCCAUCAUUUAAAGAAAGCGUAAUAGCUCACUGGU</td><td>58</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((.(((..(((.........)))..))).....(..(((......)))).)))))</code></td><td></td></tr>
+</table>
+<h3>24. <code>6xko</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>AGCAACUUAGGAUUUUAGGCUCCCCGGCGUGACCAUGCCGGGCCAAACCCAUAGGGCUGGCGGUCCCUGUGCGGUCGAAAUUCAUCCGCCGGAG</td><td>94</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>AGCAACUUAGGAUUUUAGGCUCCCCGGCGUGACCAUGCCGGGCCAAACCCAUAGGGCUGGCGGUCCCUGUGCGGUCGAAAUUCAUCCGCCGGAG</td><td>95</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>[[[[......((((((...]]]](((((((((..)))))))))....((((((((((........))))))).)))..))))))...........</code></td><td></td></tr>
+</table>
+<h3>25. <code>7d8o</code> chain <code>B</code> &mdash; deletion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>AUUUAGGUGAUUUGCUACCUUUAAGUGCAGCUAGAA<span class="del">A</span></td><td>37</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>AUUUAGGUGAUUUGCUACCUUUAAGUGCAGCUAGAA</td><td>36</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>....((((....[[[.))))......]]].......</code></td><td></td></tr>
+</table>
+<h3>26. <code>7k16</code> chain <code>P</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GCAAGGUACGGCGAAAGCCGUAGGGGCUUGAGAACCCCCCCUCCCCACUC</td><td>50</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>GCAAGGUACGGCGAAAGCCGUAGGGGCUUGAGAACCCCCCCUCCCCACUC</td><td>51</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>{{...((((((((....))))))((((...[[[...))))}}.))...]]]</code></td><td></td></tr>
+</table>
+<h3>27. <code>7mky</code> chain <code>A</code> &mdash; deletion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>CGGUGUAAGUGCAGCCCGUCUUACACCGUGCGGCACAGCGGAAACGCUGAUGUCGUA<span class="del">U</span>ACAGGGCU</td><td>66</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>CGGUGUAAGUGCAGCCCGUCUUACACCGUGCGGCACAGCGGAAACGCUGAUGUCGUAACAGGGCU</td><td>65</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((((...[[[[[..)))))))))((((((((((((....))))).)))))))...]]]]]</code></td><td></td></tr>
+</table>
+<h3>28. <code>7n2v</code> chain <code>Dt</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GCCCGGAUAGCUCAGUUGGGAGAGCAGGGGAUUGAAAAUCCCCGUGCCUUGGUUCGAUCCCGAGUCCGGGCACCA</td><td>75</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GCCCGGAUAGCUCAGUUGGGAGAGCAGGGGAUUGAAAAUCCCCGUG<span class="ins">U</span>CCUUGGUUCGAUCCCGAGUCCGGGCACCA</td><td>76</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((.....{..)))).(((((..]]]..))))).....(((((..}....))))))))))))....</code></td><td></td></tr>
+</table>
+<h3>29. <code>7n2v</code> chain <code>Pt</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGGUCGUUAGCUCAGUUGGUAGAGCAGUUGACUUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>74</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGGUCGUUAGCUCAGUUGGUAGAGCAGUUGACUUU<span class="ins">U</span>AAUCAAUUGG<span class="ins">U</span>CGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>76</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..(((......{...))).(((((...]]..))))).....(((((..}....)))))))))))).&gt;&gt;.</code></td><td></td></tr>
+</table>
+<h3>30. <code>7zta</code> chain <code>PTR1</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGGUCGUUAGCUCAGGGUAGAGCAGUUGACUUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>72</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGGUCGUUAGCUCAGGGUAGAGCAGUUGAC<span class="ins">U</span>UUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA</td><td>73</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((...{..)))).(((((...[[..)))))....(((((..}....)))))))))))).&gt;&gt;.</code></td><td></td></tr>
+</table>
+<h3>31. <code>8g7p</code> chain <code>w</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGCCCCUUAGCUCAGUGGUUAGAGCAGGCGACUAUAAUCGCUUGGCGCUGGUUCAAGUCCAGCAGGGGCCACCA</td><td>74</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGCCCCUUAGCUCAGUGGUUAGAGCAGGCGACU<span class="ins">C</span>AUAAUCGCUUGG<span class="ins">U</span>CGCUGGUUCAAGUCCAGCAGGGGCCACCA</td><td>76</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((....{...)))).(((((...[[..))))).....(((((..}....))))))))))))....</code></td><td></td></tr>
+</table>
+<h3>32. <code>8g9z</code> chain <code>E</code> &mdash; deletion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GCCCGGAUGAUCCUCAGUGGUCUGGGGUGCAGGC<span class="del">U</span>AAACCUGUAGCUGUCUAGCGACAGAGUGGUUCAAUUCCACCUUUCGGGCGC<span class="del">C</span></td><td>87</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GCCCGGAUGAUCCUCAGUGGUCUGGGGUGCAGGCAAACCUGUAGCUGUCUAGCGACAGAGUGGUUCAAUUCCACCUUUCGGGCGC</td><td>85</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((.(..((((((..[.))))))((((((....)))))).(((((....))))).((((..]....))))).)))))))..</code></td><td></td></tr>
+</table>
+<h3>33. <code>8k1e</code> chain <code>B</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGCGCUGGUGGGGCACGUCCAGCGCU</td><td>26</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGCGCUGGUGGGGCACGUCCAGCGCU<span class="ins">GGGCCGGGGUUCGAGUCCCCGCAGUGUU</span></td><td>54</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>((((((((((..[)))((((((()))))))(((((..]....))))))))))))</code></td><td></td></tr>
+</table>
+<h3>34. <code>8peg</code> chain <code>X</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGUGAGGUGGCCGAGAGGCUGAAGGCGCUCCCUGCUAAGGGAGUAUAUCCGGGGUUCGAAUCCCCGCCUCACCGCCA</td><td>77</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGUGAGGUGGCCGAGAGGCUGAAGGCGCU<span class="ins">C</span>CCCUGCUAAGGGAGUAUAUCCGGGGUUCGAAUCCCCGCCUCACCGCCA</td><td>78</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..(((..{........))).(((((..]]]..))))).(())}(((((.......))))))))))))....</code></td><td></td></tr>
+</table>
+<h3>35. <code>8peg</code> chain <code>Y</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGGUGAUUAGCUCAGCUGGGAGAGCACCUCCCUACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCACCA</td><td>75</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGGUGAUUAGCUCAGCUGGGAGAGCACCUCCCU<span class="ins">N</span>ACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCACCA</td><td>76</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((...&gt;.[..)))).(((((...}}..))))).....(.(((..]....))).))))))))..].</code></td><td></td></tr>
+</table>
+<h3>36. <code>8r6c</code> chain <code>Y</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GGCCCCUUAGCUCAGGGAGAGCAGGCGACUCAUAUCGCUUGGUCGCUGGUUCAAGUCCAGCAGGGGCCACCA</td><td>72</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GGCCCCUUAGCUCAGGGAGAGCAGGCGACUCAU<span class="ins">A</span>AUCGCUUGGUCGCUGGUUCAAGUCCAGCAGGGGCCACCA</td><td>73</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((...{.))))((((((...]]..))))))....(((((..}....))))))))))))..[.</code></td><td></td></tr>
+</table>
+<h3>37. <code>8v1i</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>AUGCUGGUGGUUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC</td><td>56</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>AUGCUGGUGGUUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC</td><td>57</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>((((((((((....[)))((((.......))))(((((..]....))))))))))))</code></td><td></td></tr>
+</table>
+<h3>38. <code>8v1i</code> chain <code>B</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>AUGCUGGUGGUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC</td><td>55</td></tr>
+  <tr><td><b>rnapdbee</b></td><td><span class="ins">G</span>AUGCUGGUGGUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC</td><td>56</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>((((((((((...[)))((((.......))))(((((..]....))))))))))))</code></td><td></td></tr>
+</table>
+<h3>39. <code>8yup</code> chain <code>V</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GUCCCCUUCGUCUAGAGGCCCAGGACACCGCCCUUCACGGCGGUAACAGGGGUUCGAAUCCCCUAGGGGACGCCA</td><td>75</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GUCCCCUUCGUCUAGAGGCCCAGGACACCGCCC<span class="ins">U</span>UUCACGGCGGUAACAGGGGUUCGAAUCCCCUAGGGGACGCCA</td><td>76</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((....{....)))).(((((...[[..)))))....(((((..}....)))))))))))).&gt;&gt;.</code></td><td></td></tr>
+</table>
+<h3>40. <code>9f9s</code> chain <code>DP</code> &mdash; insertion in rnapdbee</h3>
+<table>
+  <tr><th></th><th>Sequence</th><th>len</th></tr>
+  <tr><td><b>rnaglib</b></td><td>GCGGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUUCGCACCA</td><td>75</td></tr>
+  <tr><td><b>rnapdbee</b></td><td>GCGGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAA<span class="ins">G</span>AUCUGGAGGUCCUGUGUUCGAUCCACAGAAUUCGCACCA</td><td>76</td></tr>
+  <tr><td><b>dot-bracket</b></td><td><code>(((((((..((((........)))).(((((..]]]..))))).....(((((.......))))))))))))..&gt;.</code></td><td></td></tr>
+</table>
+</body>
+</html>
