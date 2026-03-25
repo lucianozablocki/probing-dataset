@@ -30,42 +30,52 @@ def get_opcodes(seq1: str, seq2: str) -> list:
     return difflib.SequenceMatcher(None, seq1, seq2, autojunk=False).get_opcodes()
 
 
-def format_markdown(seq_rnaglib: str, seq_rnapdbee: str) -> tuple[str, str]:
-    """Return (formatted_rnaglib, formatted_rnapdbee) with **bold** on differing region."""
-    rnaglib_parts, rnapdbee_parts = [], []
+def tag_seqs(
+    seq_rnaglib: str, seq_rnapdbee: str
+) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
+    """
+    Tag differing regions in each sequence without any padding.
+
+    Returns:
+        rng_parts — list of (kind, text) for rnaglib
+        rpd_parts — list of (kind, text) for rnapdbee
+
+    kind values: "equal" | "diff"
+    """
+    rng_parts: list[tuple[str, str]] = []
+    rpd_parts: list[tuple[str, str]] = []
+
     for tag, i1, i2, j1, j2 in get_opcodes(seq_rnaglib, seq_rnapdbee):
-        chunk_rnaglib  = seq_rnaglib[i1:i2]
-        chunk_rnapdbee = seq_rnapdbee[j1:j2]
+        chunk_rng = seq_rnaglib[i1:i2]
+        chunk_rpd = seq_rnapdbee[j1:j2]
         if tag == "equal":
-            rnaglib_parts.append(chunk_rnaglib)
-            rnapdbee_parts.append(chunk_rnapdbee)
-        elif tag == "replace":
-            rnaglib_parts.append(f"**{chunk_rnaglib}**")
-            rnapdbee_parts.append(f"**{chunk_rnapdbee}**")
-        elif tag == "delete":
-            rnaglib_parts.append(f"**{chunk_rnaglib}**")
-        elif tag == "insert":
-            rnapdbee_parts.append(f"**{chunk_rnapdbee}**")
-    return "".join(rnaglib_parts), "".join(rnapdbee_parts)
+            rng_parts.append(("equal", chunk_rng))
+            rpd_parts.append(("equal", chunk_rpd))
+        else:  # replace, delete, insert
+            if chunk_rng:
+                rng_parts.append(("diff", chunk_rng))
+            if chunk_rpd:
+                rpd_parts.append(("diff", chunk_rpd))
+
+    return rng_parts, rpd_parts
 
 
-def format_html_spans(seq_rnaglib: str, seq_rnapdbee: str) -> tuple[str, str]:
-    """Return (html_rnaglib, html_rnapdbee) with <span class="diff"> on differing region."""
-    rnaglib_parts, rnapdbee_parts = [], []
-    for tag, i1, i2, j1, j2 in get_opcodes(seq_rnaglib, seq_rnapdbee):
-        chunk_rnaglib  = html_lib.escape(seq_rnaglib[i1:i2])
-        chunk_rnapdbee = html_lib.escape(seq_rnapdbee[j1:j2])
-        if tag == "equal":
-            rnaglib_parts.append(chunk_rnaglib)
-            rnapdbee_parts.append(chunk_rnapdbee)
-        elif tag == "replace":
-            rnaglib_parts.append(f'<span class="sub">{chunk_rnaglib}</span>')
-            rnapdbee_parts.append(f'<span class="sub">{chunk_rnapdbee}</span>')
-        elif tag == "delete":
-            rnaglib_parts.append(f'<span class="del">{chunk_rnaglib}</span>')
-        elif tag == "insert":
-            rnapdbee_parts.append(f'<span class="ins">{chunk_rnapdbee}</span>')
-    return "".join(rnaglib_parts), "".join(rnapdbee_parts)
+_DIFF_STYLE = 'background:#ffe066;font-weight:bold'
+
+
+def render_tagged(parts: list[tuple[str, str]]) -> str:
+    """
+    Render (kind, text) parts into an HTML string for use inside a <pre> block.
+    Diff positions get a yellow highlight.
+    """
+    out = []
+    for kind, text in parts:
+        t = html_lib.escape(text)
+        if kind == "diff":
+            out.append(f'<span style="{_DIFF_STYLE}">{t}</span>')
+        else:
+            out.append(t)
+    return "".join(out)
 
 
 def diff_type(seq_rnaglib: str, seq_rnapdbee: str) -> str:
@@ -87,7 +97,8 @@ def write_markdown(rows: list[dict], out_path: Path) -> None:
     lines = [
         "# Sequence mismatches: rnaglib (base) vs rnapdbee",
         "",
-        f"{len(rows)} mismatches. Bold marks the differing nucleotide(s).",
+        f"{len(rows)} mismatches.",
+        "Highlighted nucleotide(s) mark the diff.",
         "",
     ]
     for i, row in enumerate(rows, 1):
@@ -97,18 +108,22 @@ def write_markdown(rows: list[dict], out_path: Path) -> None:
         seq_rnapdbee = row["sequence_rnapdbee"]
         base_pairs   = row.get("base_pairs_rnapdbee", "")
         dtype        = diff_type(seq_rnaglib, seq_rnapdbee)
-        fmt_rnaglib, fmt_rnapdbee = format_markdown(seq_rnaglib, seq_rnapdbee)
+
+        rng_parts, rpd_parts = tag_seqs(seq_rnaglib, seq_rnapdbee)
+        tagged_rng = render_tagged(rng_parts)
+        tagged_rpd = render_tagged(rpd_parts)
+        escaped_bp = html_lib.escape(base_pairs)
 
         lines += [
             "---",
             "",
             f"### {i}. `{pdbid}` chain `{chain}`  —  {dtype}",
             "",
-            f"| | Sequence | len |",
-            f"|---|---|---|",
-            f"| **rnaglib** | {fmt_rnaglib} | {len(seq_rnaglib)} |",
-            f"| **rnapdbee** | {fmt_rnapdbee} | {len(seq_rnapdbee)} |",
-            f"| **dot-bracket** | `{base_pairs}` | |",
+            "<pre>",
+            f"rnaglib  : {tagged_rng}",
+            f"rnapdbee : {tagged_rpd}",
+            f"dot-br   : {escaped_bp}",
+            "</pre>",
             "",
         ]
 
@@ -123,26 +138,21 @@ HTML_TEMPLATE = """\
 <meta charset="utf-8">
 <title>Sequence mismatches</title>
 <style>
-  body {{ font-family: monospace; font-size: 14px; padding: 2em; }}
+  body {{ font-family: sans-serif; font-size: 14px; padding: 2em; }}
   h1   {{ font-family: sans-serif; }}
-  h3   {{ font-family: sans-serif; margin-top: 2em; }}
-  table {{ border-collapse: collapse; margin-bottom: 1em; }}
-  td, th {{ padding: 4px 10px; border: 1px solid #ccc; }}
-  th {{ background: #f0f0f0; }}
-  .sub {{ background: #ffe066; font-weight: bold; border-radius: 2px; }}
-  .del {{ background: #ff9999; font-weight: bold; border-radius: 2px; }}
-  .ins {{ background: #99ff99; font-weight: bold; border-radius: 2px; }}
-  .legend span {{ display: inline-block; padding: 2px 8px; border-radius: 3px; margin-right: 8px; }}
+  h3   {{ font-family: sans-serif; margin-top: 2em; margin-bottom: 0.4em; }}
+  pre  {{ font-family: monospace; font-size: 13px; background: #f8f8f8;
+          border: 1px solid #ddd; border-radius: 4px; padding: 0.8em 1em;
+          line-height: 1.6; overflow-x: auto; margin: 0; }}
+  .legend span {{ display: inline-block; padding: 2px 8px; border-radius: 3px;
+                  margin-right: 8px; font-family: monospace; }}
 </style>
 </head>
 <body>
 <h1>Sequence mismatches: rnaglib (base) vs rnapdbee</h1>
-<p>{count} mismatches.</p>
-<p class="legend">
-  Legend:&nbsp;
-  <span class="sub">substitution</span>
-  <span class="del">deletion&nbsp;(extra in rnaglib)</span>
-  <span class="ins">insertion&nbsp;(extra in rnapdbee)</span>
+<p>{count} mismatches.
+   <span style="background:#ffe066;font-weight:bold;padding:2px 6px;border-radius:3px">highlighted</span>
+   = diff nucleotide(s)
 </p>
 {body}
 </body>
@@ -156,19 +166,22 @@ def write_html(rows: list[dict], out_path: Path) -> None:
         chain        = row["chain"]
         seq_rnaglib  = row["sequence_rnaglib"]
         seq_rnapdbee = row["sequence_rnapdbee"]
-        base_pairs   = html_lib.escape(row.get("base_pairs_rnapdbee", ""))
+        base_pairs   = row.get("base_pairs_rnapdbee", "")
         dtype        = diff_type(seq_rnaglib, seq_rnapdbee)
-        fmt_rnaglib, fmt_rnapdbee = format_html_spans(seq_rnaglib, seq_rnapdbee)
+
+        rng_parts, rpd_parts = tag_seqs(seq_rnaglib, seq_rnapdbee)
+        tagged_rng = render_tagged(rng_parts)
+        tagged_rpd = render_tagged(rpd_parts)
+        escaped_bp = html_lib.escape(base_pairs)
 
         body_parts.append(
             f"<h3>{i}. <code>{html_lib.escape(pdbid)}</code> "
             f"chain <code>{html_lib.escape(chain)}</code> &mdash; {dtype}</h3>\n"
-            f"<table>\n"
-            f"  <tr><th></th><th>Sequence</th><th>len</th></tr>\n"
-            f"  <tr><td><b>rnaglib</b></td><td>{fmt_rnaglib}</td><td>{len(seq_rnaglib)}</td></tr>\n"
-            f"  <tr><td><b>rnapdbee</b></td><td>{fmt_rnapdbee}</td><td>{len(seq_rnapdbee)}</td></tr>\n"
-            f"  <tr><td><b>dot-bracket</b></td><td><code>{base_pairs}</code></td><td></td></tr>\n"
-            f"</table>"
+            f"<pre>"
+            f"rnaglib  : {tagged_rng}\n"
+            f"rnapdbee : {tagged_rpd}\n"
+            f"dot-br   : {escaped_bp}"
+            f"</pre>"
         )
 
     out_path.write_text(
