@@ -392,9 +392,6 @@ id,chain,sequence,base_pairs
 3npq,A,GGACGAGGAGCGCUGCAAGCGAGAGCCCAGGCUCGUCCGAAACGGCGCUCA,...[[[[((((((..[..((....))...(]]]]].......).)))))).
 3npq,B,GGACGAGGAGCGCUGCAAGCGAGAGCCCAGGCUCGUCCAACGGCGCUCA,...[[[[((((((..[..((....))...(]]]]].....).)))))).
 3npq,C,GGACGAGGAGCGCUGCAAGCGAGAGCCCAGGCUCGUCCAAACGGCGCUCA,...[[[[((((((..[..((....))...(]]]]]......).)))))).
-3npq,A,A,.
-3npq,B,A,.
-3npq,C,A,.
 3nvi,E,CUCUGACCGAAAGGCGUGAUGAGC,..(...((....))......)...
 3nvi,F,CUCUGACCGAAAGGCGUGAUGAGC,..(...((....))......)...
 3nvk,K,AGCUCUGACCGAAAGGCGUGAUGA,.((.(...(......)......).
@@ -1792,14 +1789,6 @@ id,chain,sequence,base_pairs
 6yl5,J,AUUGGAGCA,...]]]]].
 6yl5,K,GGUCACAACGGCUUCCUGGCGUGACC,((((((..(.[[[.[[.)..))))))
 6yl5,L,AUUGGAGCA,...]]]]].
-6yl5,A,A,.
-6yl5,B,A,.
-6yl5,C,A,.
-6yl5,E,A,.
-6yl5,F,A,.
-6yl5,G,A,.
-6yl5,I,AA,..
-6yl5,K,A,.
 6ymc,A,UCUCUGGUUAGGAAACUAACUAGGGA,(((((((((((....)))))))))))
 6ymc,B,UCUCUGGUUAGGAAACUAACUAGGGA,(((((((((((....)))))))))))
 6ys3,a,GCCUGGCGGCCGUAGCGCGGUGGUCCCACCUGACCCCAUGCCGAACUCAGAAGUGAAACGCCGUAGCGCCGAUGGUAGUGUGGGGUCUCCCCAUGCGAGAGUAGGGAACUGCCAGGCA,((..(.(((.....((((((((....(((((((...(.....)...))))..)))...)))))).)).((.......((((((((...)))))))).......))...))))...)).
