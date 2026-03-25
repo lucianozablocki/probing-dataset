@@ -78,21 +78,6 @@ def render_tagged(parts: list[tuple[str, str]]) -> str:
     return "".join(out)
 
 
-def render_tagged_md(parts: list[tuple[str, str]]) -> str:
-    """
-    Render (kind, text) parts as GitHub-compatible Markdown.
-    Equal chunks are wrapped in backtick inline-code (monospace).
-    Diff chunks are wrapped in **bold**.
-    """
-    out = []
-    for kind, text in parts:
-        if kind == "diff":
-            out.append(f"**{text}**")
-        else:
-            out.append(f"`{text}`")
-    return "".join(out)
-
-
 def diff_type(seq_rnaglib: str, seq_rnapdbee: str) -> str:
     tags = {op[0] for op in get_opcodes(seq_rnaglib, seq_rnapdbee) if op[0] != "equal"}
     if tags == {"replace"}:
@@ -113,7 +98,7 @@ def write_markdown(rows: list[dict], out_path: Path) -> None:
         "# Sequence mismatches: rnaglib (base) vs rnapdbee",
         "",
         f"{len(rows)} mismatches.",
-        "**Bold** nucleotide(s) mark the diff; sequences and dot-bracket are monospaced.",
+        "Highlighted nucleotide(s) mark the diff.",
         "",
     ]
     for i, row in enumerate(rows, 1):
@@ -125,19 +110,20 @@ def write_markdown(rows: list[dict], out_path: Path) -> None:
         dtype        = diff_type(seq_rnaglib, seq_rnapdbee)
 
         rng_parts, rpd_parts = tag_seqs(seq_rnaglib, seq_rnapdbee)
-        tagged_rng = render_tagged_md(rng_parts)
-        tagged_rpd = render_tagged_md(rpd_parts)
+        tagged_rng = render_tagged(rng_parts)
+        tagged_rpd = render_tagged(rpd_parts)
+        escaped_bp = html_lib.escape(base_pairs)
 
         lines += [
             "---",
             "",
             f"### {i}. `{pdbid}` chain `{chain}`  —  {dtype}",
             "",
-            f"rnaglib &nbsp; : {tagged_rng}",
-            f"",
+            "<pre>",
+            f"rnaglib  : {tagged_rng}",
             f"rnapdbee : {tagged_rpd}",
-            f"",
-            f"dot-br &nbsp;&nbsp; : `{base_pairs}`",
+            f"dot-br   : {escaped_bp}",
+            "</pre>",
             "",
         ]
 

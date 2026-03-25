@@ -1,404 +1,404 @@
 # Sequence mismatches: rnaglib (base) vs rnapdbee
 
 40 mismatches.
-**Bold** nucleotide(s) mark the diff; sequences and dot-bracket are monospaced.
+Highlighted nucleotide(s) mark the diff.
 
 ---
 
 ### 1. `1e8o` chain `E`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGCCGGGCGCGGUGGCGCGCGCCUGUAGUCCCAGCUACUCGGGAGGCUC`
-
-rnapdbee : **G**`GGCCGGGCGCGGUGGCGCGCGCCUGUAGUCCCAGCUACUCGGGAGGCUC`
-
-dot-br &nbsp;&nbsp; : `((((((((((((..[[[.)))))))....((((.]]..]..)))))))))`
+<pre>
+rnaglib  : GGCCGGGCGCGGUGGCGCGCGCCUGUAGUCCCAGCUACUCGGGAGGCUC
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GGCCGGGCGCGGUGGCGCGCGCCUGUAGUCCCAGCUACUCGGGAGGCUC
+dot-br   : ((((((((((((..[[[.)))))))....((((.]]..]..)))))))))
+</pre>
 
 ---
 
 ### 2. `1l2x` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GCGCGGCACCGUCCGCGGAACAAACGG`
-
-rnapdbee : **G**`GCGCGGCACCGUCCGCGGAACAAACGG`
-
-dot-br &nbsp;&nbsp; : `..(((((..[[[.))))).......]]]`
+<pre>
+rnaglib  : GCGCGGCACCGUCCGCGGAACAAACGG
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GCGCGGCACCGUCCGCGGAACAAACGG
+dot-br   : ..(((((..[[[.))))).......]]]
+</pre>
 
 ---
 
 ### 3. `1xjr` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GAGUUCACCGAGGCCACGCGGAGUACGAUCGAGGGUACAGUGAAUU`
-
-rnapdbee : **G**`GAGUUCACCGAGGCCACGCGGAGUACGAUCGAGGGUACAGUGAAUU`
-
-dot-br &nbsp;&nbsp; : `..(((((((...((((.((((.....))..))..))).).)))))))`
+<pre>
+rnaglib  : GAGUUCACCGAGGCCACGCGGAGUACGAUCGAGGGUACAGUGAAUU
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GAGUUCACCGAGGCCACGCGGAGUACGAUCGAGGGUACAGUGAAUU
+dot-br   : ..(((((((...((((.((((.....))..))..))).).)))))))
+</pre>
 
 ---
 
 ### 4. `1y27` chain `X`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GAUCAUAUAAUCGCGUGGAUAUGGCACGCAAGUUUCUACCGGGCACCGUAAAUGUCCGACUAUGGUC`
-
-rnapdbee : **G**`GAUCAUAUAAUCGCGUGGAUAUGGCACGCAAGUUUCUACCGGGCACCGUAAAUGUCCGACUAUGGUC`
-
-dot-br &nbsp;&nbsp; : `.((((((((..(.(((((.....[[))))).)[.....)]((((((]].....))))))..)))))))`
+<pre>
+rnaglib  : GAUCAUAUAAUCGCGUGGAUAUGGCACGCAAGUUUCUACCGGGCACCGUAAAUGUCCGACUAUGGUC
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GAUCAUAUAAUCGCGUGGAUAUGGCACGCAAGUUUCUACCGGGCACCGUAAAUGUCCGACUAUGGUC
+dot-br   : .((((((((..(.(((((.....[[))))).)[.....)]((((((]].....))))))..)))))))
+</pre>
 
 ---
 
 ### 5. `3k1v` chain `A`  —  deletion in rnapdbee
 
-rnaglib &nbsp; : `AGAGGUUCUAG`**C**`CCCUCUAUAAAAAACUAA`
-
-rnapdbee : `AGAGGUUCUAG``CCCUCUAUAAAAAACUAA`
-
-dot-br &nbsp;&nbsp; : `(((((...[[[.)))))........]]].`
+<pre>
+rnaglib  : AGAGGUUCUAG<span style="background:#ffe066;font-weight:bold">C</span>CCCUCUAUAAAAAACUAA
+rnapdbee : AGAGGUUCUAGCCCUCUAUAAAAAACUAA
+dot-br   : (((((...[[[.)))))........]]].
+</pre>
 
 ---
 
 ### 6. `4jf2` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GAACCGCGAAAGCGGUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA`
-
-rnapdbee : **G**`GAACCGCGAAAGCGGUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA`
-
-dot-br &nbsp;&nbsp; : `((((((((....))))))))((((((((.......[[[[[..))))))))......((((....))))..]]]]]..`
+<pre>
+rnaglib  : GAACCGCGAAAGCGGUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GAACCGCGAAAGCGGUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA
+dot-br   : ((((((((....))))))))((((((((.......[[[[[..))))))))......((((....))))..]]]]]..
+</pre>
 
 ---
 
 ### 7. `4mgn` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GAAUCAAUAGUAGUUAACCCUCUCUUCCGAAGCGAGCCGGGGGCGGUGGGAGCCCGGUGAAGACGGUUAAUGAAACGGCAGUUCC`
-
-rnapdbee : **G**`GAAUCAAUAGUAGUUAACCCUCUCUUCCGAAGCGAGCCGGGGGCGGUGGGAGCCCGGUGAAGACGGUUAAUGAAACGGCAGUUCC`
-
-dot-br &nbsp;&nbsp; : `(((((........(((((((...(((((.....[..((((((..........]))))))))))).))))))).....[[[.)))))`
+<pre>
+rnaglib  : GAAUCAAUAGUAGUUAACCCUCUCUUCCGAAGCGAGCCGGGGGCGGUGGGAGCCCGGUGAAGACGGUUAAUGAAACGGCAGUUCC
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GAAUCAAUAGUAGUUAACCCUCUCUUCCGAAGCGAGCCGGGGGCGGUGGGAGCCCGGUGAAGACGGUUAAUGAAACGGCAGUUCC
+dot-br   : (((((........(((((((...(((((.....[..((((((..........]))))))))))).))))))).....[[[.)))))
+</pre>
 
 ---
 
 ### 8. `4mgn` chain `B`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCU`
-
-rnapdbee : **G**`CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCU`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((....{..)))).(((((..]]]..))))).....(((((..}....)))))))))))).`
+<pre>
+rnaglib  : CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCU
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCU
+dot-br   : (((((((..((((....{..)))).(((((..]]]..))))).....(((((..}....)))))))))))).
+</pre>
 
 ---
 
 ### 9. `4mgn` chain `D`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCUC`
-
-rnapdbee : **G**`CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCUC`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((....{..)))).(((((..]]]..))))).....(((((..}....))))))))))))..`
+<pre>
+rnaglib  : CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCUC
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>CGGAAGUAGUUCAGUGGUAGAACACCACCUUGCCAAGGUGGGGGUCGCGGGUUCGAGUCCCGUCUUCCGCUC
+dot-br   : (((((((..((((....{..)))).(((((..]]]..))))).....(((((..}....))))))))))))..
+</pre>
 
 ---
 
 ### 10. `4oqu` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGAUCACGAGGGGGAGACCCCGGCAACCUGGGACGGACACCCAAGGUGCUCACACCGGAGACGGUGGAUCCGGCCCGAGAGGGCAACGAAGGUCCGA`
-
-rnapdbee : `GGAUCACGAGGGGGAGACCCCGGCAACCUGGGACGGACACCCAAGGUGCUCACACCGGAGACGGUGGAUCCGGCCCGAGAGGGCAACGAAGGUCCGA`**A**
-
-dot-br &nbsp;&nbsp; : `(((((....((((....))))(((..((((((.[[[[[.))).))).)))..(((((....)))))))))).((((....)))).......]]]]]..`
+<pre>
+rnaglib  : GGAUCACGAGGGGGAGACCCCGGCAACCUGGGACGGACACCCAAGGUGCUCACACCGGAGACGGUGGAUCCGGCCCGAGAGGGCAACGAAGGUCCGA
+rnapdbee : GGAUCACGAGGGGGAGACCCCGGCAACCUGGGACGGACACCCAAGGUGCUCACACCGGAGACGGUGGAUCCGGCCCGAGAGGGCAACGAAGGUCCGA<span style="background:#ffe066;font-weight:bold">A</span>
+dot-br   : (((((....((((....))))(((..((((((.[[[[[.))).))).)))..(((((....)))))))))).((((....)))).......]]]]]..
+</pre>
 
 ---
 
 ### 11. `5aox` chain `C`  —  deletion in rnapdbee
 
-rnaglib &nbsp; : `GCCGGGCGCGGUGGCUCACGCCUGUAAUCCCAGCACUUUGGGAGGCCGAGGCGGGAGGAUCGCGAAC`**AC**`GCGAGACCCCGUCUCUA`
-
-rnapdbee : **G**`GCCGGGCGCGGUGGCUCACGCCUGUAAUCCCAGCACUUUGGGAGGCCGAGGCGGGAGGAUCGCGAAC``GCGAGACCCCGUCUCUA`
-
-dot-br &nbsp;&nbsp; : `(((((((((.(..[[[.).)))))....((((.]].]...))))))))((((((((.(..(((((..)))))..)))))))))..`
+<pre>
+rnaglib  : GCCGGGCGCGGUGGCUCACGCCUGUAAUCCCAGCACUUUGGGAGGCCGAGGCGGGAGGAUCGCGAAC<span style="background:#ffe066;font-weight:bold">AC</span>GCGAGACCCCGUCUCUA
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GCCGGGCGCGGUGGCUCACGCCUGUAAUCCCAGCACUUUGGGAGGCCGAGGCGGGAGGAUCGCGAACGCGAGACCCCGUCUCUA
+dot-br   : (((((((((.(..[[[.).)))))....((((.]].]...))))))))((((((((.(..(((((..)))))..)))))))))..
+</pre>
 
 ---
 
 ### 12. `5axm` chain `P`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAGAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUCCCCAC`
-
-rnapdbee : **G**`GGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAGAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUCCCCAC`
-
-dot-br &nbsp;&nbsp; : `((((((..((((.....[..)))).(((((.......))))).....(((((..]....)))))))))))...`
+<pre>
+rnaglib  : GGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAGAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUCCCCAC
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAGAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUCCCCAC
+dot-br   : ((((((..((((.....[..)))).(((((.......))))).....(((((..]....)))))))))))...
+</pre>
 
 ---
 
 ### 13. `5d5l` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GAAGGCCGAAAGGUCUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA`
-
-rnapdbee : **G**`GAAGGCCGAAAGGUCUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA`
-
-dot-br &nbsp;&nbsp; : `((((((((....))))))))((((((((.......[[[[[..))))))))......((((....))))..]]]]]..`
+<pre>
+rnaglib  : GAAGGCCGAAAGGUCUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GAAGGCCGAAAGGUCUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA
+dot-br   : ((((((((....))))))))((((((((.......[[[[[..))))))))......((((....))))..]]]]]..
+</pre>
 
 ---
 
 ### 14. `5e81` chain `1K`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGGUCGUUAGCUCAGUGAGAGCAGUUGAC``UUUAAUCAAUUGUCGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-rnapdbee : `GGGUCGUUAGCUCAGUGAGAGCAGUUGAC`**U**`UUUAAUCAAUUGUCGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-dot-br &nbsp;&nbsp; : `(.(...(..((((...[.)))).(((((...{{..))))).......((..]....))...)...).)..[.`
+<pre>
+rnaglib  : GGGUCGUUAGCUCAGUGAGAGCAGUUGACUUUAAUCAAUUGUCGCAGGUUCGAAUCCUGCACGACCCACCA
+rnapdbee : GGGUCGUUAGCUCAGUGAGAGCAGUUGAC<span style="background:#ffe066;font-weight:bold">U</span>UUUAAUCAAUUGUCGCAGGUUCGAAUCCUGCACGACCCACCA
+dot-br   : (.(...(..((((...[.)))).(((((...{{..))))).......((..]....))...)...).)..[.
+</pre>
 
 ---
 
 ### 15. `5e81` chain `1L`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGGUCGUUAGCUCAUGGAGCAGUUGAC``UUUAAUCAAUUGCGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-rnapdbee : `GGGUCGUUAGCUCAUGGAGCAGUUGAC`**U**`UUUAAUCAAUUGCGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-dot-br &nbsp;&nbsp; : `((.......((((..{)))).(((((...[[..)))))....(.((..}....)).)......))..{.`
+<pre>
+rnaglib  : GGGUCGUUAGCUCAUGGAGCAGUUGACUUUAAUCAAUUGCGCAGGUUCGAAUCCUGCACGACCCACCA
+rnapdbee : GGGUCGUUAGCUCAUGGAGCAGUUGAC<span style="background:#ffe066;font-weight:bold">U</span>UUUAAUCAAUUGCGCAGGUUCGAAUCCUGCACGACCCACCA
+dot-br   : ((.......((((..{)))).(((((...[[..)))))....(.((..}....)).)......))..{.
+</pre>
 
 ---
 
 ### 16. `5el4` chain `1K`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGGUCGUUAGCUCAGUGGAGCAGUUGAC``UUUAAUCAAUUCGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-rnapdbee : `GGGUCGUUAGCUCAGUGGAGCAGUUGAC`**U**`UUUAAUCAAUUCGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-dot-br &nbsp;&nbsp; : `(.(......((.....[..))..((((...{...)))).....(((..]....)))......).)..[.`
+<pre>
+rnaglib  : GGGUCGUUAGCUCAGUGGAGCAGUUGACUUUAAUCAAUUCGCAGGUUCGAAUCCUGCACGACCCACCA
+rnapdbee : GGGUCGUUAGCUCAGUGGAGCAGUUGAC<span style="background:#ffe066;font-weight:bold">U</span>UUUAAUCAAUUCGCAGGUUCGAAUCCUGCACGACCCACCA
+dot-br   : (.(......((.....[..))..((((...{...)))).....(((..]....)))......).)..[.
+</pre>
 
 ---
 
 ### 17. `5ju8` chain `AY`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGGUGAUUAGCUCAGGGGAGAGCACCUCCCU``ACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCA`
-
-rnapdbee : `GGGUGAUUAGCUCAGGGGAGAGCACCUCCCU`**N**`ACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((......)))).(((((...]]..))))).....(((((.......)))))))))))).`
+<pre>
+rnaglib  : GGGUGAUUAGCUCAGGGGAGAGCACCUCCCUACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCA
+rnapdbee : GGGUGAUUAGCUCAGGGGAGAGCACCUCCCU<span style="background:#ffe066;font-weight:bold">N</span>ACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCA
+dot-br   : (((((((..((((......)))).(((((...]]..))))).....(((((.......)))))))))))).
+</pre>
 
 ---
 
 ### 18. `5l3p` chain `y`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GCUGAUAUAGCUCAGUUGGUAGAGCGCACCCUUGGU``AGGGUGAGGUCGGCAGUUCGAAUCUGCCUAUCAGCA`
-
-rnapdbee : `GCUGAUAUAGCUCAGUUGGUAGAGCGCACCCUUGGU`**G**`AGGGUGAGGUCGGCAGUUCGAAUCUGCCUAUCAGCA`
-
-dot-br &nbsp;&nbsp; : `.(((..(..(((......[...)))..((((.......))))......(((....]......))))..)))..`
+<pre>
+rnaglib  : GCUGAUAUAGCUCAGUUGGUAGAGCGCACCCUUGGUAGGGUGAGGUCGGCAGUUCGAAUCUGCCUAUCAGCA
+rnapdbee : GCUGAUAUAGCUCAGUUGGUAGAGCGCACCCUUGGU<span style="background:#ffe066;font-weight:bold">G</span>AGGGUGAGGUCGGCAGUUCGAAUCUGCCUAUCAGCA
+dot-br   : .(((..(..(((......[...)))..((((.......))))......(((....]......))))..)))..
+</pre>
 
 ---
 
 ### 19. `5ns3` chain `C`  —  deletion in rnapdbee
 
-rnaglib &nbsp; : `CGCACCUGACCCCAUGCCGAACUCAGA`**A**`GUGCG`
-
-rnapdbee : `CGCACCUGACCCCAUGCCGAACUCAGA``GUGCG`
-
-dot-br &nbsp;&nbsp; : `(((((((((...(.....)...)))).)))))`
+<pre>
+rnaglib  : CGCACCUGACCCCAUGCCGAACUCAGA<span style="background:#ffe066;font-weight:bold">A</span>GUGCG
+rnapdbee : CGCACCUGACCCCAUGCCGAACUCAGAGUGCG
+dot-br   : (((((((((...(.....)...)))).)))))
+</pre>
 
 ---
 
 ### 20. `6cu1` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGUGGCUCACAUUUGUUGCGGGUUCGAGACCCGUCAGAGCGAAAGCUCUGUAGCUCAAUGGUAGAGCGGUGUAGUCACC`
-
-rnapdbee : **G**`GGUGGCUCACAUUUGUUGCGGGUUCGAGACCCGUCAGAGCGAAAGCUCUGUAGCUCAAUGGUAGAGCGGUGUAGUCACC`
-
-dot-br &nbsp;&nbsp; : `.(((((((.(((((....(((((..[....)))))((((((....))))))..((((....]..))))))))))))))))`
+<pre>
+rnaglib  : GGUGGCUCACAUUUGUUGCGGGUUCGAGACCCGUCAGAGCGAAAGCUCUGUAGCUCAAUGGUAGAGCGGUGUAGUCACC
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GGUGGCUCACAUUUGUUGCGGGUUCGAGACCCGUCAGAGCGAAAGCUCUGUAGCUCAAUGGUAGAGCGGUGUAGUCACC
+dot-br   : .(((((((.(((((....(((((..[....)))))((((((....))))))..((((....]..))))))))))))))))
+</pre>
 
 ---
 
 ### 21. `6fz0` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `AGGCGCAUUUGAACUGUAUUGUACGCCUUGCAGCAAAAGUACUAAAAA`
-
-rnapdbee : `AGGCGCAUUUGAACUGUAUUGUACGCCUUGCAGCAAAAGUACUAAAAA`**A**
-
-dot-br &nbsp;&nbsp; : `[[[[..............((((((]]]]((...))...)))).))....`
+<pre>
+rnaglib  : AGGCGCAUUUGAACUGUAUUGUACGCCUUGCAGCAAAAGUACUAAAAA
+rnapdbee : AGGCGCAUUUGAACUGUAUUGUACGCCUUGCAGCAAAAGUACUAAAAA<span style="background:#ffe066;font-weight:bold">A</span>
+dot-br   : [[[[..............((((((]]]]((...))...)))).))....
+</pre>
 
 ---
 
 ### 22. `6mwn` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GCAAACAUCAUUUGGCCUUAAAUGGGAUUCUGUGAGAGGGGAUCCCUCCAUUGACAGCUGGACUGUUCUUUGGGGCCUUAUGUGGUGUUUG`
-
-rnapdbee : **G**`GCAAACAUCAUUUGGCCUUAAAUGGGAUUCUGUGAGAGGGGAUCCCUCCAUUGACAGCUGGACUGUUCUUUGGGGCCUUAUGUGGUGUUUG`
-
-dot-br &nbsp;&nbsp; : `..((((((((((..((((......((((((((.......)))))))).(((..(.(((.....)))..)..)))))))....))))))))))`
+<pre>
+rnaglib  : GCAAACAUCAUUUGGCCUUAAAUGGGAUUCUGUGAGAGGGGAUCCCUCCAUUGACAGCUGGACUGUUCUUUGGGGCCUUAUGUGGUGUUUG
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GCAAACAUCAUUUGGCCUUAAAUGGGAUUCUGUGAGAGGGGAUCCCUCCAUUGACAGCUGGACUGUUCUUUGGGGCCUUAUGUGGUGUUUG
+dot-br   : ..((((((((((..((((......((((((((.......)))))))).(((..(.(((.....)))..)..)))))))....))))))))))
+</pre>
 
 ---
 
 ### 23. `6prv` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `CCAGGAUGUUGGCUUAGAAGCAGCCAUCAUUUAAAGAAAGCGUAAUAGCUCACUGGU`
-
-rnapdbee : **G**`CCAGGAUGUUGGCUUAGAAGCAGCCAUCAUUUAAAGAAAGCGUAAUAGCUCACUGGU`
-
-dot-br &nbsp;&nbsp; : `(((((.(((..(((.........)))..))).....(..(((......)))).)))))`
+<pre>
+rnaglib  : CCAGGAUGUUGGCUUAGAAGCAGCCAUCAUUUAAAGAAAGCGUAAUAGCUCACUGGU
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>CCAGGAUGUUGGCUUAGAAGCAGCCAUCAUUUAAAGAAAGCGUAAUAGCUCACUGGU
+dot-br   : (((((.(((..(((.........)))..))).....(..(((......)))).)))))
+</pre>
 
 ---
 
 ### 24. `6xko` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `AGCAACUUAGGAUUUUAGGCUCCCCGGCGUGACCAUGCCGGGCCAAACCCAUAGGGCUGGCGGUCCCUGUGCGGUCGAAAUUCAUCCGCCGGAG`
-
-rnapdbee : **G**`AGCAACUUAGGAUUUUAGGCUCCCCGGCGUGACCAUGCCGGGCCAAACCCAUAGGGCUGGCGGUCCCUGUGCGGUCGAAAUUCAUCCGCCGGAG`
-
-dot-br &nbsp;&nbsp; : `[[[[......((((((...]]]](((((((((..)))))))))....((((((((((........))))))).)))..))))))...........`
+<pre>
+rnaglib  : AGCAACUUAGGAUUUUAGGCUCCCCGGCGUGACCAUGCCGGGCCAAACCCAUAGGGCUGGCGGUCCCUGUGCGGUCGAAAUUCAUCCGCCGGAG
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>AGCAACUUAGGAUUUUAGGCUCCCCGGCGUGACCAUGCCGGGCCAAACCCAUAGGGCUGGCGGUCCCUGUGCGGUCGAAAUUCAUCCGCCGGAG
+dot-br   : [[[[......((((((...]]]](((((((((..)))))))))....((((((((((........))))))).)))..))))))...........
+</pre>
 
 ---
 
 ### 25. `7d8o` chain `B`  —  deletion in rnapdbee
 
-rnaglib &nbsp; : `AUUUAGGUGAUUUGCUACCUUUAAGUGCAGCUAGAA`**A**
-
-rnapdbee : `AUUUAGGUGAUUUGCUACCUUUAAGUGCAGCUAGAA`
-
-dot-br &nbsp;&nbsp; : `....((((....[[[.))))......]]].......`
+<pre>
+rnaglib  : AUUUAGGUGAUUUGCUACCUUUAAGUGCAGCUAGAA<span style="background:#ffe066;font-weight:bold">A</span>
+rnapdbee : AUUUAGGUGAUUUGCUACCUUUAAGUGCAGCUAGAA
+dot-br   : ....((((....[[[.))))......]]].......
+</pre>
 
 ---
 
 ### 26. `7k16` chain `P`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GCAAGGUACGGCGAAAGCCGUAGGGGCUUGAGAACCCCCCCUCCCCACUC`
-
-rnapdbee : **G**`GCAAGGUACGGCGAAAGCCGUAGGGGCUUGAGAACCCCCCCUCCCCACUC`
-
-dot-br &nbsp;&nbsp; : `{{...((((((((....))))))((((...[[[...))))}}.))...]]]`
+<pre>
+rnaglib  : GCAAGGUACGGCGAAAGCCGUAGGGGCUUGAGAACCCCCCCUCCCCACUC
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GCAAGGUACGGCGAAAGCCGUAGGGGCUUGAGAACCCCCCCUCCCCACUC
+dot-br   : {{...((((((((....))))))((((...[[[...))))}}.))...]]]
+</pre>
 
 ---
 
 ### 27. `7mky` chain `A`  —  deletion in rnapdbee
 
-rnaglib &nbsp; : `CGGUGUAAGUGCAGCCCGUCUUACACCGUGCGGCACAGCGGAAACGCUGAUGUCGUA`**U**`ACAGGGCU`
-
-rnapdbee : `CGGUGUAAGUGCAGCCCGUCUUACACCGUGCGGCACAGCGGAAACGCUGAUGUCGUA``ACAGGGCU`
-
-dot-br &nbsp;&nbsp; : `(((((((((...[[[[[..)))))))))((((((((((((....))))).)))))))...]]]]]`
+<pre>
+rnaglib  : CGGUGUAAGUGCAGCCCGUCUUACACCGUGCGGCACAGCGGAAACGCUGAUGUCGUA<span style="background:#ffe066;font-weight:bold">U</span>ACAGGGCU
+rnapdbee : CGGUGUAAGUGCAGCCCGUCUUACACCGUGCGGCACAGCGGAAACGCUGAUGUCGUAACAGGGCU
+dot-br   : (((((((((...[[[[[..)))))))))((((((((((((....))))).)))))))...]]]]]
+</pre>
 
 ---
 
 ### 28. `7n2v` chain `Dt`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GCCCGGAUAGCUCAGUUGGGAGAGCAGGGGAUUGAAAAUCCCCGUG``CCUUGGUUCGAUCCCGAGUCCGGGCACCA`
-
-rnapdbee : `GCCCGGAUAGCUCAGUUGGGAGAGCAGGGGAUUGAAAAUCCCCGUG`**U**`CCUUGGUUCGAUCCCGAGUCCGGGCACCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((.....{..)))).(((((..]]]..))))).....(((((..}....))))))))))))....`
+<pre>
+rnaglib  : GCCCGGAUAGCUCAGUUGGGAGAGCAGGGGAUUGAAAAUCCCCGUGCCUUGGUUCGAUCCCGAGUCCGGGCACCA
+rnapdbee : GCCCGGAUAGCUCAGUUGGGAGAGCAGGGGAUUGAAAAUCCCCGUG<span style="background:#ffe066;font-weight:bold">U</span>CCUUGGUUCGAUCCCGAGUCCGGGCACCA
+dot-br   : (((((((..((((.....{..)))).(((((..]]]..))))).....(((((..}....))))))))))))....
+</pre>
 
 ---
 
 ### 29. `7n2v` chain `Pt`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGGUCGUUAGCUCAGUUGGUAGAGCAGUUGACUUU``AAUCAAUUGG``CGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-rnapdbee : `GGGUCGUUAGCUCAGUUGGUAGAGCAGUUGACUUU`**U**`AAUCAAUUGG`**U**`CGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..(((......{...))).(((((...]]..))))).....(((((..}....)))))))))))).>>.`
+<pre>
+rnaglib  : GGGUCGUUAGCUCAGUUGGUAGAGCAGUUGACUUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA
+rnapdbee : GGGUCGUUAGCUCAGUUGGUAGAGCAGUUGACUUU<span style="background:#ffe066;font-weight:bold">U</span>AAUCAAUUGG<span style="background:#ffe066;font-weight:bold">U</span>CGCAGGUUCGAAUCCUGCACGACCCACCA
+dot-br   : (((((((..(((......{...))).(((((...]]..))))).....(((((..}....)))))))))))).&gt;&gt;.
+</pre>
 
 ---
 
 ### 30. `7zta` chain `PTR1`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGGUCGUUAGCUCAGGGUAGAGCAGUUGAC``UUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-rnapdbee : `GGGUCGUUAGCUCAGGGUAGAGCAGUUGAC`**U**`UUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((...{..)))).(((((...[[..)))))....(((((..}....)))))))))))).>>.`
+<pre>
+rnaglib  : GGGUCGUUAGCUCAGGGUAGAGCAGUUGACUUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA
+rnapdbee : GGGUCGUUAGCUCAGGGUAGAGCAGUUGAC<span style="background:#ffe066;font-weight:bold">U</span>UUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA
+dot-br   : (((((((..((((...{..)))).(((((...[[..)))))....(((((..}....)))))))))))).&gt;&gt;.
+</pre>
 
 ---
 
 ### 31. `8g7p` chain `w`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGCCCCUUAGCUCAGUGGUUAGAGCAGGCGACU``AUAAUCGCUUGG``CGCUGGUUCAAGUCCAGCAGGGGCCACCA`
-
-rnapdbee : `GGCCCCUUAGCUCAGUGGUUAGAGCAGGCGACU`**C**`AUAAUCGCUUGG`**U**`CGCUGGUUCAAGUCCAGCAGGGGCCACCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((....{...)))).(((((...[[..))))).....(((((..}....))))))))))))....`
+<pre>
+rnaglib  : GGCCCCUUAGCUCAGUGGUUAGAGCAGGCGACUAUAAUCGCUUGGCGCUGGUUCAAGUCCAGCAGGGGCCACCA
+rnapdbee : GGCCCCUUAGCUCAGUGGUUAGAGCAGGCGACU<span style="background:#ffe066;font-weight:bold">C</span>AUAAUCGCUUGG<span style="background:#ffe066;font-weight:bold">U</span>CGCUGGUUCAAGUCCAGCAGGGGCCACCA
+dot-br   : (((((((..((((....{...)))).(((((...[[..))))).....(((((..}....))))))))))))....
+</pre>
 
 ---
 
 ### 32. `8g9z` chain `E`  —  deletion in rnapdbee
 
-rnaglib &nbsp; : `GCCCGGAUGAUCCUCAGUGGUCUGGGGUGCAGGC`**U**`AAACCUGUAGCUGUCUAGCGACAGAGUGGUUCAAUUCCACCUUUCGGGCGC`**C**
-
-rnapdbee : `GCCCGGAUGAUCCUCAGUGGUCUGGGGUGCAGGC``AAACCUGUAGCUGUCUAGCGACAGAGUGGUUCAAUUCCACCUUUCGGGCGC`
-
-dot-br &nbsp;&nbsp; : `(((((((.(..((((((..[.))))))((((((....)))))).(((((....))))).((((..]....))))).)))))))..`
+<pre>
+rnaglib  : GCCCGGAUGAUCCUCAGUGGUCUGGGGUGCAGGC<span style="background:#ffe066;font-weight:bold">U</span>AAACCUGUAGCUGUCUAGCGACAGAGUGGUUCAAUUCCACCUUUCGGGCGC<span style="background:#ffe066;font-weight:bold">C</span>
+rnapdbee : GCCCGGAUGAUCCUCAGUGGUCUGGGGUGCAGGCAAACCUGUAGCUGUCUAGCGACAGAGUGGUUCAAUUCCACCUUUCGGGCGC
+dot-br   : (((((((.(..((((((..[.))))))((((((....)))))).(((((....))))).((((..]....))))).)))))))..
+</pre>
 
 ---
 
 ### 33. `8k1e` chain `B`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGCGCUGGUGGGGCACGUCCAGCGCU`
-
-rnapdbee : `GGCGCUGGUGGGGCACGUCCAGCGCU`**GGGCCGGGGUUCGAGUCCCCGCAGUGUU**
-
-dot-br &nbsp;&nbsp; : `((((((((((..[)))((((((()))))))(((((..]....))))))))))))`
+<pre>
+rnaglib  : GGCGCUGGUGGGGCACGUCCAGCGCU
+rnapdbee : GGCGCUGGUGGGGCACGUCCAGCGCU<span style="background:#ffe066;font-weight:bold">GGGCCGGGGUUCGAGUCCCCGCAGUGUU</span>
+dot-br   : ((((((((((..[)))((((((()))))))(((((..]....))))))))))))
+</pre>
 
 ---
 
 ### 34. `8peg` chain `X`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGUGAGGUGGCCGAGAGGCUGAAGGCGCU``CCCUGCUAAGGGAGUAUAUCCGGGGUUCGAAUCCCCGCCUCACCGCCA`
-
-rnapdbee : `GGUGAGGUGGCCGAGAGGCUGAAGGCGCU`**C**`CCCUGCUAAGGGAGUAUAUCCGGGGUUCGAAUCCCCGCCUCACCGCCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..(((..{........))).(((((..]]]..))))).(())}(((((.......))))))))))))....`
+<pre>
+rnaglib  : GGUGAGGUGGCCGAGAGGCUGAAGGCGCUCCCUGCUAAGGGAGUAUAUCCGGGGUUCGAAUCCCCGCCUCACCGCCA
+rnapdbee : GGUGAGGUGGCCGAGAGGCUGAAGGCGCU<span style="background:#ffe066;font-weight:bold">C</span>CCCUGCUAAGGGAGUAUAUCCGGGGUUCGAAUCCCCGCCUCACCGCCA
+dot-br   : (((((((..(((..{........))).(((((..]]]..))))).(())}(((((.......))))))))))))....
+</pre>
 
 ---
 
 ### 35. `8peg` chain `Y`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGGUGAUUAGCUCAGCUGGGAGAGCACCUCCCU``ACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCACCA`
-
-rnapdbee : `GGGUGAUUAGCUCAGCUGGGAGAGCACCUCCCU`**N**`ACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCACCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((...>.[..)))).(((((...}}..))))).....(.(((..]....))).))))))))..].`
+<pre>
+rnaglib  : GGGUGAUUAGCUCAGCUGGGAGAGCACCUCCCUACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCACCA
+rnapdbee : GGGUGAUUAGCUCAGCUGGGAGAGCACCUCCCU<span style="background:#ffe066;font-weight:bold">N</span>ACAAGGAGGGGGUCGGCGGUUCGAUCCCGUCAUCACCCACCA
+dot-br   : (((((((..((((...&gt;.[..)))).(((((...}}..))))).....(.(((..]....))).))))))))..].
+</pre>
 
 ---
 
 ### 36. `8r6c` chain `Y`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GGCCCCUUAGCUCAGGGAGAGCAGGCGACUCAU``AUCGCUUGGUCGCUGGUUCAAGUCCAGCAGGGGCCACCA`
-
-rnapdbee : `GGCCCCUUAGCUCAGGGAGAGCAGGCGACUCAU`**A**`AUCGCUUGGUCGCUGGUUCAAGUCCAGCAGGGGCCACCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((...{.))))((((((...]]..))))))....(((((..}....))))))))))))..[.`
+<pre>
+rnaglib  : GGCCCCUUAGCUCAGGGAGAGCAGGCGACUCAUAUCGCUUGGUCGCUGGUUCAAGUCCAGCAGGGGCCACCA
+rnapdbee : GGCCCCUUAGCUCAGGGAGAGCAGGCGACUCAU<span style="background:#ffe066;font-weight:bold">A</span>AUCGCUUGGUCGCUGGUUCAAGUCCAGCAGGGGCCACCA
+dot-br   : (((((((..((((...{.))))((((((...]]..))))))....(((((..}....))))))))))))..[.
+</pre>
 
 ---
 
 ### 37. `8v1i` chain `A`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `AUGCUGGUGGUUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC`
-
-rnapdbee : **G**`AUGCUGGUGGUUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC`
-
-dot-br &nbsp;&nbsp; : `((((((((((....[)))((((.......))))(((((..]....))))))))))))`
+<pre>
+rnaglib  : AUGCUGGUGGUUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>AUGCUGGUGGUUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC
+dot-br   : ((((((((((....[)))((((.......))))(((((..]....))))))))))))
+</pre>
 
 ---
 
 ### 38. `8v1i` chain `B`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `AUGCUGGUGGUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC`
-
-rnapdbee : **G**`AUGCUGGUGGUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC`
-
-dot-br &nbsp;&nbsp; : `((((((((((...[)))((((.......))))(((((..]....))))))))))))`
+<pre>
+rnaglib  : AUGCUGGUGGUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC
+rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>AUGCUGGUGGUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC
+dot-br   : ((((((((((...[)))((((.......))))(((((..]....))))))))))))
+</pre>
 
 ---
 
 ### 39. `8yup` chain `V`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GUCCCCUUCGUCUAGAGGCCCAGGACACCGCCC``UUCACGGCGGUAACAGGGGUUCGAAUCCCCUAGGGGACGCCA`
-
-rnapdbee : `GUCCCCUUCGUCUAGAGGCCCAGGACACCGCCC`**U**`UUCACGGCGGUAACAGGGGUUCGAAUCCCCUAGGGGACGCCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((....{....)))).(((((...[[..)))))....(((((..}....)))))))))))).>>.`
+<pre>
+rnaglib  : GUCCCCUUCGUCUAGAGGCCCAGGACACCGCCCUUCACGGCGGUAACAGGGGUUCGAAUCCCCUAGGGGACGCCA
+rnapdbee : GUCCCCUUCGUCUAGAGGCCCAGGACACCGCCC<span style="background:#ffe066;font-weight:bold">U</span>UUCACGGCGGUAACAGGGGUUCGAAUCCCCUAGGGGACGCCA
+dot-br   : (((((((..((((....{....)))).(((((...[[..)))))....(((((..}....)))))))))))).&gt;&gt;.
+</pre>
 
 ---
 
 ### 40. `9f9s` chain `DP`  —  insertion in rnapdbee
 
-rnaglib &nbsp; : `GCGGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAA``AUCUGGAGGUCCUGUGUUCGAUCCACAGAAUUCGCACCA`
-
-rnapdbee : `GCGGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAA`**G**`AUCUGGAGGUCCUGUGUUCGAUCCACAGAAUUCGCACCA`
-
-dot-br &nbsp;&nbsp; : `(((((((..((((........)))).(((((..]]]..))))).....(((((.......))))))))))))..>.`
+<pre>
+rnaglib  : GCGGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUUCGCACCA
+rnapdbee : GCGGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAA<span style="background:#ffe066;font-weight:bold">G</span>AUCUGGAGGUCCUGUGUUCGAUCCACAGAAUUCGCACCA
+dot-br   : (((((((..((((........)))).(((((..]]]..))))).....(((((.......))))))))))))..&gt;.
+</pre>
