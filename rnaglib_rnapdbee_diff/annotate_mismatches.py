@@ -199,17 +199,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--input",
-        default="sequence_mismatches_rnaglib_vs_rnapdbee.csv",
+        default="rnaglib_rnapdbee_diff/sequence_mismatches_rnaglib_vs_rnapdbee.csv",
         help="Mismatch CSV from compare_sequences.py (default: %(default)s)",
     )
     parser.add_argument(
         "--md",
-        default="sequence_mismatches_annotated.md",
+        default="rnaglib_rnapdbee_diff/sequence_mismatches_annotated.md",
         help="Output Markdown path (default: %(default)s)",
     )
     parser.add_argument(
         "--html",
-        default="sequence_mismatches_annotated.html",
+        default="rnaglib_rnapdbee_diff/sequence_mismatches_annotated.html",
         help="Output HTML path (default: %(default)s)",
     )
     parser.add_argument(

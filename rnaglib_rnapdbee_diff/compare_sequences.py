@@ -88,6 +88,7 @@ def compare(
     print(f"Keys missing in rnapdbee file   : {len(missing_in_rnapdbee)}")
     print(f"Sequence mismatches             : {len(mismatches)}")
     print(f"Output written to               : {out_path}")
+    print(f"Unique PDB IDs in mismatches       : {len(set((m['pdbid']) for m in mismatches))}")
 
     if missing_in_rnapdbee:
         print("\nKeys in rnaglib but not found in rnapdbee:")
@@ -114,7 +115,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--out",
-        default="sequence_mismatches_rnaglib_vs_rnapdbee.csv",
+        default="rnaglib_rnapdbee_diff/sequence_mismatches_rnaglib_vs_rnapdbee.csv",
         help="Output CSV path (default: %(default)s)",
     )
     args = parser.parse_args()
