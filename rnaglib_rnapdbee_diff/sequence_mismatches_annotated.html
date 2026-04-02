@@ -16,7 +16,7 @@
 </head>
 <body>
 <h1>Sequence mismatches: rnaglib (base) vs rnapdbee</h1>
-<p>23 mismatches.
+<p>21 mismatches.
    <span style="background:#ffe066;font-weight:bold;padding:2px 6px;border-radius:3px">highlighted</span>
    = diff nucleotide(s)
 </p>
@@ -56,59 +56,51 @@ dot-br   : ((((((..((((.....[..)))).(((((.......))))).....(((((..]....))))))))))
 <pre>rnaglib  : GAAGGCCGAAAGGUCUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA
 rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GAAGGCCGAAAGGUCUUCCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA
 dot-br   : ((((((((....))))))))((((((((.......[[[[[..))))))))......((((....))))..]]]]]..</pre>
-<h3>10. <code>5e81</code> chain <code>1K</code> &mdash; insertion in rnapdbee</h3>
-<pre>rnaglib  : GGGUCGUUAGCUCAGUGAGAGCAGUUGACUUUAAUCAAUUGUCGCAGGUUCGAAUCCUGCACGACCCACCA
-rnapdbee : GGGUCGUUAGCUCAGUGAGAGCAGUUGAC<span style="background:#ffe066;font-weight:bold">U</span>UUUAAUCAAUUGUCGCAGGUUCGAAUCCUGCACGACCCACCA
-dot-br   : (.(...(..((((...[.)))).(((((..{{..))))).......((..]....))...)...).)..[.</pre>
-<h3>11. <code>5ns3</code> chain <code>C</code> &mdash; deletion in rnapdbee</h3>
+<h3>10. <code>5ns3</code> chain <code>C</code> &mdash; deletion in rnapdbee</h3>
 <pre>rnaglib  : CGCACCUGACCCCAUGCCGAACUCAGA<span style="background:#ffe066;font-weight:bold">A</span>GUGCG
 rnapdbee : CGCACCUGACCCCAUGCCGAACUCAGAGUGCG
 dot-br   : (((((((((...(.....)...)))).)))))</pre>
-<h3>12. <code>6prv</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<h3>11. <code>6prv</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
 <pre>rnaglib  : CCAGGAUGUUGGCUUAGAAGCAGCCAUCAUUUAAAGAAAGCGUAAUAGCUCACUGGU
 rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>CCAGGAUGUUGGCUUAGAAGCAGCCAUCAUUUAAAGAAAGCGUAAUAGCUCACUGGU
 dot-br   : (((((.(((..(((.........)))..))).....(..(((......)))).)))))</pre>
-<h3>13. <code>6xko</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<h3>12. <code>6xko</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
 <pre>rnaglib  : AGCAACUUAGGAUUUUAGGCUCCCCGGCGUGACCAUGCCGGGCCAAACCCAUAGGGCUGGCGGUCCCUGUGCGGUCGAAAUUCAUCCGCCGGAG
 rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>AGCAACUUAGGAUUUUAGGCUCCCCGGCGUGACCAUGCCGGGCCAAACCCAUAGGGCUGGCGGUCCCUGUGCGGUCGAAAUUCAUCCGCCGGAG
 dot-br   : [[[[......((((((...]]]](((((((((..)))))))))....((((((((((........))))))).)))..))))))...........</pre>
-<h3>14. <code>7d8o</code> chain <code>B</code> &mdash; deletion in rnapdbee</h3>
+<h3>13. <code>7d8o</code> chain <code>B</code> &mdash; deletion in rnapdbee</h3>
 <pre>rnaglib  : AUUUAGGUGAUUUGCUACCUUUAAGUGCAGCUAGAA<span style="background:#ffe066;font-weight:bold">A</span>
 rnapdbee : AUUUAGGUGAUUUGCUACCUUUAAGUGCAGCUAGAA
 dot-br   : ....((((....[[[.))))......]]].......</pre>
-<h3>15. <code>7k16</code> chain <code>P</code> &mdash; insertion in rnapdbee</h3>
+<h3>14. <code>7k16</code> chain <code>P</code> &mdash; insertion in rnapdbee</h3>
 <pre>rnaglib  : GCAAGGUACGGCGAAAGCCGUAGGGGCUUGAGAACCCCCCCUCCCCACUC
 rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>GCAAGGUACGGCGAAAGCCGUAGGGGCUUGAGAACCCCCCCUCCCCACUC
 dot-br   : {{...((((((((....))))))((((...[[[...))))}}.))...]]]</pre>
-<h3>16. <code>7mky</code> chain <code>A</code> &mdash; deletion in rnapdbee</h3>
+<h3>15. <code>7mky</code> chain <code>A</code> &mdash; deletion in rnapdbee</h3>
 <pre>rnaglib  : CGGUGUAAGUGCAGCCCGUCUUACACCGUGCGGCACAGCGGAAACGCUGAUGUCGUA<span style="background:#ffe066;font-weight:bold">U</span>ACAGGGCU
 rnapdbee : CGGUGUAAGUGCAGCCCGUCUUACACCGUGCGGCACAGCGGAAACGCUGAUGUCGUAACAGGGCU
 dot-br   : (((((((((...[[[[[..)))))))))((((((((((((....))))).)))))))...]]]]]</pre>
-<h3>17. <code>7n2v</code> chain <code>Pt</code> &mdash; insertion in rnapdbee</h3>
+<h3>16. <code>7n2v</code> chain <code>Pt</code> &mdash; insertion in rnapdbee</h3>
 <pre>rnaglib  : GGGUCGUUAGCUCAGUUGGUAGAGCAGUUGACUUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA
-rnapdbee : GGGUCGUUAGCUCAGUUGGUAGAGCAGUUGAC<span style="background:#ffe066;font-weight:bold">U</span>UUUAAUCAAUUGGCGCAGGUUCGAAUCCUGCACGACCCACCA
-dot-br   : (((((((..(((......{...))).(((((...]]..)))))....(((((..}....)))))))))))).&gt;&gt;.</pre>
-<h3>18. <code>8g7p</code> chain <code>w</code> &mdash; insertion in rnapdbee</h3>
-<pre>rnaglib  : GGCCCCUUAGCUCAGUGGUUAGAGCAGGCGACUAUAAUCGCUUGGCGCUGGUUCAAGUCCAGCAGGGGCCACCA
-rnapdbee : GGCCCCUUAGCUCAGUGGUUAGAGCAGGCGACU<span style="background:#ffe066;font-weight:bold">C</span>AUAAUCGCUUGG<span style="background:#ffe066;font-weight:bold">U</span>CGCUGGUUCAAGUCCAGCAGGGGCCACCA
-dot-br   : (((((((..((((....{...)))).(((((...[[..))))).....(((((..}....))))))))))))....</pre>
-<h3>19. <code>8g9z</code> chain <code>E</code> &mdash; deletion in rnapdbee</h3>
+rnapdbee : GGGUCGUUAGCUCAGUUGGUAGAGCAGUUGACUUU<span style="background:#ffe066;font-weight:bold">U</span>AAUCAAUUGG<span style="background:#ffe066;font-weight:bold">U</span>CGCAGGUUCGAAUCCUGCACGACCCACCA
+dot-br   : (((((((..(((......{...))).(((((...]]..))))).....(((((..}....)))))))))))).&gt;&gt;.</pre>
+<h3>17. <code>8g9z</code> chain <code>E</code> &mdash; deletion in rnapdbee</h3>
 <pre>rnaglib  : GCCCGGAUGAUCCUCAGUGGUCUGGGGUGCAGGC<span style="background:#ffe066;font-weight:bold">U</span>AAACCUGUAGCUGUCUAGCGACAGAGUGGUUCAAUUCCACCUUUCGGGCGC<span style="background:#ffe066;font-weight:bold">C</span>
 rnapdbee : GCCCGGAUGAUCCUCAGUGGUCUGGGGUGCAGGCAAACCUGUAGCUGUCUAGCGACAGAGUGGUUCAAUUCCACCUUUCGGGCGC
 dot-br   : (((((((.(..((((((..[.))))))((((((....)))))).(((((....))))).((((..]....))))).)))))))..</pre>
-<h3>20. <code>8k1e</code> chain <code>B</code> &mdash; insertion in rnapdbee</h3>
+<h3>18. <code>8k1e</code> chain <code>B</code> &mdash; insertion in rnapdbee</h3>
 <pre>rnaglib  : GGCGCUGGUGGGGCACGUCCAGCGCU
 rnapdbee : GGCGCUGGUGGGGCACGUCCAGCGCU<span style="background:#ffe066;font-weight:bold">GGGCCGGGGUUCGAGUCCCCGCAGUGUU</span>
 dot-br   : ((((((((((..[)))((((((()))))))(((((..]....))))))))))))</pre>
-<h3>21. <code>8peg</code> chain <code>X</code> &mdash; insertion in rnapdbee</h3>
+<h3>19. <code>8peg</code> chain <code>X</code> &mdash; insertion in rnapdbee</h3>
 <pre>rnaglib  : GGUGAGGUGGCCGAGAGGCUGAAGGCGCUCCCUGCUAAGGGAGUAUAUCCGGGGUUCGAAUCCCCGCCUCACCGCCA
 rnapdbee : GGUGAGGUGGCCGAGAGGCUGAAGGCGCU<span style="background:#ffe066;font-weight:bold">C</span>CCCUGCUAAGGGAGUAUAUCCGGGGUUCGAAUCCCCGCCUCACCGCCA
 dot-br   : (((((((..(((..{........))).(((((..]]]..))))).(())}(((((.......))))))))))))....</pre>
-<h3>22. <code>8v1i</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
+<h3>20. <code>8v1i</code> chain <code>A</code> &mdash; insertion in rnapdbee</h3>
 <pre>rnaglib  : AUGCUGGUGGUUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC
 rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>AUGCUGGUGGUUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC
 dot-br   : ((((((((((....[)))((((.......))))(((((..]....))))))))))))</pre>
-<h3>23. <code>8v1i</code> chain <code>B</code> &mdash; insertion in rnapdbee</h3>
+<h3>21. <code>8v1i</code> chain <code>B</code> &mdash; insertion in rnapdbee</h3>
 <pre>rnaglib  : AUGCUGGUGGUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC
 rnapdbee : <span style="background:#ffe066;font-weight:bold">G</span>AUGCUGGUGGUGGCACUCCUGGUUUCCAGGACGGGGUUCAAAUCCCUGCGGCGUC
 dot-br   : ((((((((((...[)))((((.......))))(((((..]....))))))))))))</pre>
