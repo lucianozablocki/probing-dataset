@@ -515,7 +515,7 @@ id,chain,sequence,base_pairs
 4gma,Z,UUAAAGCCUUAUGGUCGCUACCCCGGUAGCGUUAAAAGGGAAGACGGGUGAGAAUCCCGCGCAGCCCCCGCUACUGUGAGGGAGGACGAAGCCCUAAGCCACUGCCGAAAGGUGGGAAGGCAGGGUGGAGGAUGAGUCCCGAGCCAGGAGACCUGCCAUAAGGUUAGUUCGCCUUCGGGGGGAAGGUGAACA,...(.(((((((((((((((((..))))))).....((.(..(.((((.......)))))(((([[[[[[)).[[[...((((...(....(.(...(((.(((((....)))))...))).).)....)......))))..))]]]....)))))))))))))).(...(((((]]]]].])))))...).
 4gxy,A,GGCGGCAGGUGCUCCCGACGUCGGGAGUUAAAAGGGAAGCCGGUGCAAGUCCGGCACGGUCCCGCCACUGUGACGGGGAGUCGCCCCUCGGGAUGUGCCACUGGCCGGCCGGGAAGGCGGAGGGGCGGCGAGGAUCCGGAGUCAGGAAACCUGCCUGCCGUC,((((((((((.(((..((..))..))).....((....(((((.......)))))[[((.....)).(((...(((...(((((((.((.......(((.(((((())))))...))).)).)))))))......)))..]]))).....))))))))))))
 4ifd,R,CCCCGAGAGGGGGUUUUUUUUUUUUUUUUU,((((....))))..................
-4jf2,A,GAACCGCGAAAGCGGUUCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA,((((((((....))))))))((((((((.......[[[[[..))))))))......((((....))))..]]]]]..
+4jf2,A,GAACCGCGAAAGCGGUUCACGACGAUACUUAUUUCCUUUGAUCGUCGUUAUUACUGGCUUCGGCCACAAAGGAGA,(((((((....)))))))((((((((.......[[[[[..))))))))......((((....))))..]]]]]..
 4jgn,E,UUGCUGCUGCUGCUGCUGCU,....................
 4jrc,A,GGAACCCUCUCUUCCGAAGCGAGCCGGGGGCGGUGGGAGCCCGGUGAAGACGGUUCC,((((((...(((((.....[..((((((..........]))))))))))).))))))
 4jrc,B,GGAACCCUCUCUUCCGAAGCGAGCCGGGGGCGGUGGGAGCCCGGUGAAGACGGUUCC,((((((...(((((.....[..((((((..........]))))))))))).))))))
