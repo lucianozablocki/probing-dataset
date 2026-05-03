@@ -65,45 +65,35 @@ def main():
             continue
         seen.append((row['pdb_id'], row['sequence_id'], row['experiment_type']))
         count+=1
-        print(count)
-        print(row['sequence_id'])
-        print(row['experiment_type'])
         rows_for_pdb.append(row)
     print(f"Found {len(rows_for_pdb)} rows for pdb_id '{pdb_id}'.")
 
     results = []
-    skipped = 0
 
     for idx, row in enumerate(rows_for_pdb):
         alignment_seqB = row.get('alignment_seqB')
         if not alignment_seqB:
-            print(f"Warning: row {row['sequence_id']} has no alignment_seqB, skipping.")
-            skipped += 1
-            continue
+            print(f"CRITICAL: row {row['sequence_id']} has no alignment_seqB, fix and try again.")
+            break
 
         start, _ = find_alignment_bounds(alignment_seqB)
         if start is None:
-            print(f"Warning: row {row['sequence_id']} has all-gap seqB, skipping.")
-            skipped += 1
-            continue
+            print(f"CRITICAL: row {row['sequence_id']} has all-gap seqB, fix and try again.")
+            break
 
         alignment_seqA = row.get('alignment_seqA', '')
-        # if idx==14:
-        # print(alignment_seqA)
-        # print(row.get('alignment_seqB'))
 
-        # Compute aligned position: start of seqB + input_position + gaps in alignment_seqA
-        # within the [start, start+input_position) region.
-        gaps_in_region = alignment_seqA[start:start + input_position].count('-')
-        aligned_position = start + input_position + gaps_in_region
-
-        if aligned_position >= len(alignment_seqA):
+        # Map input_position (0-indexed in original seqB) to the alignment column.
+        # We walk alignment_seqB and collect columns where seqB has a real nucleotide;
+        # the input_position-th such column is the one to delete.
+        seqB_nongap_cols = [i for i, c in enumerate(alignment_seqB) if c != '-']
+        if input_position >= len(seqB_nongap_cols):
             print(
-                f"Warning: aligned_position {aligned_position} out of bounds for "
-                f"row {row['sequence_id']} (alignment len={len(alignment_seqA)}), skipping."
+                f"CRITICAL: input_position {input_position} out of range for "
+                f"row {row['sequence_id']} (seqB has {len(seqB_nongap_cols)} nucleotides), fix and try again."
             )
-            skipped += 1
-            continue
+            break
+        aligned_position = seqB_nongap_cols[input_position]
 
         reactivity = list(row.get('reactivity', []))
         reactivity_errors = list(row.get('reactivity_errors', []))
@@ -123,7 +113,7 @@ def main():
 
     out_df = pd.DataFrame(results)
     out_df.to_csv(output_path, index=False)
-    print(f"Written {len(results)} rows to '{output_path}' (skipped {skipped}).")
+    print(f"Written {len(results)} rows to '{output_path}'.")
 
 
 if __name__ == "__main__":
