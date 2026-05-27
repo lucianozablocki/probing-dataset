@@ -2,12 +2,12 @@
 """
 delete_from_probing.py
 
-Takes a pdb_id and a position (0-indexed within seqB) as input.
+Takes a pdb_id and a position (1-indexed within seqB) as input.
 For each alignment row with that pdb_id, computes the aligned position as:
     aligned_position = input_position + initial_gaps_in_seqB
-Then removes that column from alignment_seqA, reactivity, and reactivity_errors.
+Then removes that column from alignment_seqA, alignment_seqB, reactivity, and reactivity_errors.
 
-Output CSV columns: pdb_id, rnagym_id, reactivity, reactivity_errors, alignment_seqA, alignment_seqB.
+Output CSV columns: pdb_id, rnagym_id, reactivity, reactivity_errors, alignment_seqA, alignment_seqB, experiment.
 """
 
 import argparse
@@ -37,33 +37,42 @@ def main():
     )
     parser.add_argument("pdb_id", type=str, help="PDB ID to filter rows by")
     parser.add_argument(
-        "position",
+        "chain",
+        type=str,
+        help="Chain identifier within the PDB structure",
+    )
+    parser.add_argument(
+        "nucleotide",
         type=int,
-        help="Position within seqB (0-indexed) to remove from each alignment",
+        help="Nucleotide number within seqB (1-indexed) to remove from each alignment",
     )
     parser.add_argument(
         "--output",
         type=str,
         default=None,
-        help="Output CSV file path (default: <pdb_id>_pos<position>_deleted.csv)",
+        help="Output CSV file path (default: <pdb_id>_chain<chain>_nt<nucleotide>_deleted.csv)",
     )
     args = parser.parse_args()
 
     pdb_id = args.pdb_id.lower()
-    input_position = args.position
-    output_path = args.output or f"{pdb_id}_pos{input_position}_deleted.csv"
+    input_position = args.nucleotide - 1  # Convert to 0-indexed
+    chain = args.chain
+    output_path = args.output or f"{pdb_id}_chain{chain}_nt{args.nucleotide}_deleted.csv"
 
     print("Loading parquet file...")
     df = pd.read_parquet(PARQUET_URL)
+    
+    RNAGYM_ID = 'sequence_id'
+    EXPERIMENT = 'experiment_type'
 
     seen=[]
     count=0
     rows_for_pdb=[]
     rnagym_seqs_aligned_with_pdb_id = df[df['pdb_id']==pdb_id].reset_index(drop=True)
     for _, row in rnagym_seqs_aligned_with_pdb_id.iterrows():
-        if (row['pdb_id'], row['sequence_id'], row['experiment_type']) in seen:
+        if (row['pdb_id'], row[RNAGYM_ID], row[EXPERIMENT]) in seen:
             continue
-        seen.append((row['pdb_id'], row['sequence_id'], row['experiment_type']))
+        seen.append((row['pdb_id'], row[RNAGYM_ID], row[EXPERIMENT]))
         count+=1
         rows_for_pdb.append(row)
     print(f"Found {len(rows_for_pdb)} rows for pdb_id '{pdb_id}'.")
@@ -98,13 +107,25 @@ def main():
         reactivity = list(row.get('reactivity', []))
         reactivity_errors = list(row.get('reactivity_errors', []))
 
+        # reactivity is indexed by seqA nucleotides (not alignment columns).
+        # If aligned_position is a gap in seqA, there is no reactivity entry to remove.
+        # Otherwise, compute the seqA index by counting non-gap chars before aligned_position.
+        if alignment_seqA[aligned_position] != '-':
+            seqA_index = aligned_position - alignment_seqA[:aligned_position].count('-')
+            new_reactivity = reactivity[:seqA_index] + reactivity[seqA_index + 1:]
+            new_reactivity_errors = reactivity_errors[:seqA_index] + reactivity_errors[seqA_index + 1:]
+        else:
+            new_reactivity = reactivity
+            new_reactivity_errors = reactivity_errors
+
         results.append({
             'pdb_id': row['pdb_id'],
-            'rnagym_id': row['sequence_id'],
-            'reactivity': reactivity[:aligned_position] + reactivity[aligned_position + 1:],
-            'reactivity_errors': reactivity_errors[:aligned_position] + reactivity_errors[aligned_position + 1:],
+            'rnagym_id': row[RNAGYM_ID],
+            'reactivity': new_reactivity,
+            'reactivity_errors': new_reactivity_errors,
             'alignment_seqA': alignment_seqA[:aligned_position] + alignment_seqA[aligned_position + 1:],
             'alignment_seqB': alignment_seqB[:aligned_position] + alignment_seqB[aligned_position + 1:],
+            'experiment': row[EXPERIMENT],
         })
 
     if not results:
