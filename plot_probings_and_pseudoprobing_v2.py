@@ -1,11 +1,16 @@
-import matplotlib.pyplot as plt
-plt.rcParams["figure.figsize"] = (15,3)
-rnapdb_dataset=pd.read_csv("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/rna_pdb_dataset_bp.csv")
-rnagym_seqs=pd.read_parquet("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/rnagym_vs_rnapdb_alignments_postprocessed.parquet")
+# from os import name
+from ast import literal_eval
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+import matplotlib.pyplot as plt
+plt.rcParams["figure.figsize"] = (15,3)
+# rnapdb_dataset=pd.read_csv("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/rna_pdb_dataset_bp.csv")
+# rnagym_seqs=pd.read_parquet("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/rnagym_vs_rnapdb_alignments_postprocessed.parquet")
+structure_and_probing_df=pd.read_csv("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/structure_and_probing.csv")
+
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
@@ -23,7 +28,7 @@ for simbolA in simbolos:
             match_dic[(simbolA, simbolB)] = Match
         else:
             match_dic[(simbolA, simbolB)] = Mismatch
-from Bio import pairwise2
+# from Bio import pairwise2
 
 def find_alignment_bounds(alignment_seqB):
     """Find start and end of seqB in the alignment (first/last non-gap positions)."""
@@ -112,7 +117,7 @@ def find_alignment_bounds(alignment_seqB):
 import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = (15,3)
 
-def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, save_fig=False):
+def plot_probings_and_pseudoprobing(pdb_id, chain, rows_of_pdbid, alignment_bounds, save_fig=False):
   """
   Plot probings and pseudo-probing for a given pdb_id.
 
@@ -121,32 +126,37 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
     rows_of_pdbid: List of rows containing probing data
     alignment_bounds: List of (start_alignm, end_alignm) tuples, one per row in rows_of_pdbid
   """
+  print(pdb_id)
+  print(chain)
+  # print(rows_of_pdbid[:2])
+  # return 0
   plt.figure()
   plt.grid()
-  # the aligned sequence is the same in all alignments file row, just take the first
-  # ^ ABOVE IS NOT ALWAYS TRUE, THERE ARE MULTIPLE CHAINS FOR EACH PBD ID
-  ref_seq = rows_of_pdbid[0]['seqB']
-  # `rnapdb_rows` holds all RNA PDB dataset rows for the given pdb_id,
-  # we need to find the one that matches the aligned sequence to get the correct structure
-  rnapdb_rows=rnapdb_dataset[rnapdb_dataset['id']==pdb_id]
-  struct=None
-  # before, we were taking the first sequence from all the possible chains.
-  # changed to iterate over all pdb rows
-  for idx, rnapdb_row in rnapdb_rows.iterrows():
-    # basically find which of all the chains the alignment was run against
-    if rnapdb_row['sequence']==ref_seq:
-      struct=rnapdb_row['base_pairs']
-  # print(f"{pdb_id}")
-  # print(f"{struct}")
-  if not struct:
-    # at this point, we now that the reference sequence from the alignment doesn't match any of the sequences in rnapdb for this pdb_id,
-    # so we can't get the correct structure to plot the pseudo-probing
-    # and mainly because we used different tools to get the structure (rnapdbee) vs to get the sequences (rnaglib)
-    print(f"reference seq differs between rnaglib and rnapdbee {pdb_id},")
-    # anyways, they differ in at most a few nucleotides, so we can either
-    # 1) run the alignment again for the "new sequence"
-    # 2) put some kind of marker in the "not matching nucleotides", so in the plot we see that they differ
-    return 2
+  # the pdb sequence is the same for all rows, just take the first
+  ref_seq = rows_of_pdbid[0]['sequence']
+  # # `rnapdb_rows` holds all RNA PDB dataset rows for the given pdb_id,
+  # # we need to find the one that matches the aligned sequence to get the correct structure
+  # rnapdb_rows=rnapdb_dataset[rnapdb_dataset['id']==pdb_id]
+  # struct=None
+  # # before, we were taking the first sequence from all the possible chains.
+  # # changed to iterate over all pdb rows
+  # for idx, rnapdb_row in rnapdb_rows.iterrows():
+  #   # basically find which of all the chains the alignment was run against
+  #   if rnapdb_row['sequence']==ref_seq:
+  #     struct=rnapdb_row['base_pairs']
+  struct = rows_of_pdbid[0]['dot_bracket']
+  # # print(f"{pdb_id}")
+  # # print(f"{struct}")
+  # if not struct:
+  #   # at this point, we now that the reference sequence from the alignment doesn't match any of the sequences in rnapdb for this pdb_id,
+  #   # so we can't get the correct structure to plot the pseudo-probing
+  #   # and mainly because we used different tools to get the structure (rnapdbee) vs to get the sequences (rnaglib)
+  #   print(f"reference seq differs between rnaglib and rnapdbee {pdb_id},")
+  #   # anyways, they differ in at most a few nucleotides, so we can either
+  #   # 1) run the alignment again for the "new sequence"
+  #   # 2) put some kind of marker in the "not matching nucleotides", so in the plot we see that they differ
+  #   return 2
+
   # print(struct)
   pseudo_probing=[1 if s=="." else 0 for s in list(struct)]
   pseudo_probing=np.array(pseudo_probing)-1.5
@@ -162,14 +172,28 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
   match_counts = [0] * seq_len
   total_seqs = len(rows_of_pdbid)
   for idx, row in enumerate(rows_of_pdbid):
-    start_alignm, end_alignm = alignment_bounds[idx]
-    seqA = row.get('alignment_seqA')
-    seqB_aligned = row.get('alignment_seqB')
+    start, end = alignment_bounds[idx]
+    if (len(row['dot_bracket']) == len(row['sequence']) == (end - start + 1)):
+        # print(f"All lengths match for pdb {row['pdb_id']}")
+        pass
+    else:
+        # print(f"Length mismatch for pdb {row['pdb_id']}: base_pairs length={len(row['base_pairs'])}, sequence length={len(row['sequence'])}, alignment length={end - start + 1}")
+        # len_mismatch_count+=1
+        return
+    
+    # Check if this row's alignment has seqB gaps
+    if row['aligned_pdb_seq'][start:end+1].count('-') > 0:
+      has_seqB_gap = True
+      # len_gaps_count+=1
+      return
+
+    aligned_rnagym_seq = row.get('aligned_rnagym_seq')
+    aligned_pdb_seq = row.get('aligned_pdb_seq')
     # Map aligned positions to seqB positions
     seqB_pos = 0
-    for align_idx in range(start_alignm, min(end_alignm + 1, len(seqA))):
-      if align_idx < len(seqB_aligned) and seqB_aligned[align_idx] != '-':
-        if seqB_pos < seq_len and seqA[align_idx] == seqB_aligned[align_idx] and seqA[align_idx] != '-':
+    for align_idx in range(start, min(end + 1, len(aligned_rnagym_seq))):
+      if align_idx < len(aligned_pdb_seq) and aligned_pdb_seq[align_idx] != '-':
+        if seqB_pos < seq_len and aligned_rnagym_seq[align_idx] == aligned_pdb_seq[align_idx] and aligned_rnagym_seq[align_idx] != '-':
           match_counts[seqB_pos] += 1
         seqB_pos += 1
 
@@ -195,14 +219,14 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
     tick_label.set_fontweight('bold' if freq > 0.5 else 'normal')
   plt.xlim(-.2, seq_len)
 
-  has_seqB_gap = False
+  # has_seqB_gap = False
   for idx, row in enumerate(rows_of_pdbid):
-    start_alignm, end_alignm = alignment_bounds[idx]
+    start, end = alignment_bounds[idx]
     # print(f"align starts at {start_alignm} and ends at {end_alignm}")
-    probing=row['reactivity']
-    error=row['reactivity_errors']
-    seqA_aligned = row.get('alignment_seqA')
-    seqB_aligned = row.get('alignment_seqB')
+    probing=literal_eval(row['reactivity'])
+    # error=row['reactivity_errors']
+    aligned_rnagym_seq = row.get('aligned_rnagym_seq')
+    aligned_pdb_seq = row.get('aligned_pdb_seq')
 
     # Map probing values to seqB positions
     # start_alignm is where seqB starts in the alignment, so it maps to seqB position 0
@@ -212,10 +236,10 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
     x_positions = []
     gap_positions = []  # positions where seqA has a gap
     seqB_pos = 0
-    seqA_pos = start_alignm
+    seqA_pos = start
 
-    for align_idx in range(start_alignm, min(end_alignm + 1, len(seqB_aligned))):
-      if seqA_aligned[align_idx] == '-':
+    for align_idx in range(start, min(end + 1, len(aligned_pdb_seq))):
+      if aligned_rnagym_seq[align_idx] == '-':
         # print(f"gap found at idx {align_idx}")
         # seqA has a gap - mark this position
         gap_positions.append(seqB_pos)
@@ -226,11 +250,7 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
         seqA_pos += 1
       seqB_pos += 1
 
-    # Check if this row's alignment has seqB gaps
-    if seq_len != len(probing_mapped) + len(gap_positions):
-      has_seqB_gap = True
-      break
-
+    # print(probing_mapped)
     probing_slice = np.array(probing_mapped, dtype=float)
 
     # Find NaN positions (marked as -1000)
@@ -241,8 +261,8 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
     probing_clean = probing_slice.copy()
     probing_clean[nan_mask] = 0
 
-    line_color = 'b' if row['experiment_type']=='2A3_MaP' else 'g'
-    plt.plot(x_positions, probing_clean, color=line_color, alpha=.6 if pdb_id_counts[pdb_id]<20 else .2)
+    line_color = 'b' if row['experiment']=='2A3_MaP' else 'g'
+    plt.plot(x_positions, probing_clean, color=line_color, alpha=.2) # or .6 for numerous ones
     # pearson_coef, p_value = pearsonr(probing_clean[x_positions], np.array([1 if s=="." else 0 for s in list(struct)]))
     # print(f"pearson coef: {pearson_coef}")
     # print(f"p_value: {p_value}")
@@ -251,12 +271,31 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
     if len(all_gap_indices) > 0:
       plt.scatter(all_gap_indices, [0] * len(all_gap_indices), marker='x', s=50,
                   color=line_color, linewidths=2, zorder=5)
-  if has_seqB_gap:
-    print(f"there's probably gaps in seqB for pdb id {pdb_id}, skipping plot")
-    return 1
+  # if has_seqB_gap:
+  #   print(f"there's probably gaps in seqB for pdb id {pdb_id}, skipping plot")
+  #   return 1
   plt.plot(pseudo_probing[0:seq_len],color='black')
   plt.title(f'{pdb_id.upper()}')
   if save_fig:
-    plt.savefig(f"/content/drive/MyDrive/probing-dataset/rnagym-rnapdb-overlapped-probing-figs-gapseqB/{pdb_id}.png")
+    plt.savefig(f"probing_plots/{pdb_id}_{chain}.png")
   plt.show()
   return 0
+
+
+if __name__=="__main__":
+  # Example usage
+  # print("ohla")
+  # pdb_id = "4v4j"
+  # rows_of_pdbid = rnagym_seqs[rnagym_seqs['pdb_id'] == pdb_id].to_dict('records')
+  # print(structure_and_probing_df.groupby(['pdb_id','chain']))
+  for (pdb_id, chain), group in structure_and_probing_df.groupby(['pdb_id','chain']):
+    plot_probings_and_pseudoprobing(
+        pdb_id,
+        chain,
+        group.to_dict('records'),
+        [find_alignment_bounds(row['aligned_pdb_seq']) for row in group.to_dict('records')],
+        save_fig=True
+      )
+
+  # alignment_bounds = [find_alignment_bounds(row['alignment_seqB']) for row in rows_of_pdbid]
+  # plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, save_fig=True)
