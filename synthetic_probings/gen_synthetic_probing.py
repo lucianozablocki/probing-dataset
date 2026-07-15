@@ -1,7 +1,9 @@
 from ast import literal_eval
 import bisect
+import json
 import math
 import operator
+from pathlib import Path
 import pandas as pd
 import numpy as np
 
@@ -135,3 +137,15 @@ print("\n")
 print(max_by_nt)
 print(nts_at_which_max_occurs)
 print(f"Total processed rows: {total_processed_rows}")
+
+output_path = Path(__file__).resolve().parent / f"synthetic_probing_results_N{N}.json"
+payload = {
+    'N': N,
+    'max_by_nt': max_by_nt,
+    'nts_at_which_max_occurs': nts_at_which_max_occurs,
+}
+
+with output_path.open('w', encoding='utf-8') as f:
+    json.dump(payload, f, ensure_ascii=True, indent=2)
+
+print(f"Saved results to: {output_path}")
