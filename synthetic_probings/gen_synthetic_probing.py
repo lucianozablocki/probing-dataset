@@ -1,4 +1,7 @@
 from ast import literal_eval
+import bisect
+import math
+import operator
 import pandas as pd
 import numpy as np
 
@@ -25,7 +28,7 @@ N=5 # we will look for as many max values as floor(len(region)/N)
 for (pdb_id, chain), group in grouped_df:
     unpaired_regions = []
     # print(f"Processing pdb_id={pdb_id}, chain={chain}")
-    # if pdb_id!='5gah':
+    # if pdb_id!='5gah' or chain!='1':
     #     continue
     print(f"Processing pdb_id={pdb_id}, chain={chain}")
     dot_bracket = group.iloc[0]['dot_bracket']
@@ -45,8 +48,9 @@ for (pdb_id, chain), group in grouped_df:
                 current_region = []
     if current_region:
         unpaired_regions.append(current_region)
-    max_by_region=[-float('inf')]*len(unpaired_regions)
-    max_nt_by_region=[""]*len(unpaired_regions)
+    # print(unpaired_regions)
+    max_by_region=[[] for _ in unpaired_regions]
+    max_nt_by_region=[[] for _ in unpaired_regions]
     # print(max_by_region)
     for row in row_as_dict:
         total_processed_rows+=1
@@ -67,47 +71,62 @@ for (pdb_id, chain), group in grouped_df:
             gap_rnagymseq_count+=1
             break
         for idx, region in enumerate(unpaired_regions):
+            # print(f"analyzing region {region}")
             region_len=len(region)
             probing_start = region[0] + start
             probing_end = region[-1] + start
             probing_values = literal_eval(row['reactivity'])[probing_start:probing_end+1]
-            n_maxs_to_find=math.floor(region_len/N)
+            n_maxs_to_find = math.ceil(region_len/N)
+            # print(n_maxs_to_find)
             indexed = list(enumerate(probing_values))
             top_n_maxs_to_find = sorted(indexed, key=operator.itemgetter(1))[-n_maxs_to_find:]
-            indxs_and_values=list(reversed(top_n_maxs_to_find)) # list of n max (idx,val) tuples 
-            # for _ in maximums_to_find:
-            #     # probing_values_cpy=probing_values
-            #     # Find the maximum value
-            #     if max_idx is not None:
-            #         max_val = max(probing_values[:max_idx]+probing_values[max_idx+1:])
-            #         # Find the first index of that value
-            #         max_idx = probing_values.index(max_val)
-            #     else:
-            #         max_val = max(probing_values[:max_idx]+probing_values[max_idx+1:])
-            #         # Find the first index of that value
-            #         max_idx = probing_values.index(max_val)
-
-            nt_at_which_max_occurs=sequence[region[max_idx]]
-
-            if max_val > max_by_region[idx] and max_val != -1000:
-                aligned_rnagym_seq=row['aligned_rnagym_seq']
-                aligned_pdb_seq=row['aligned_pdb_seq']
-                rnagym_nt = aligned_rnagym_seq[region[max_idx]+start]
-                if rnagym_nt == nt_at_which_max_occurs:
-                    max_by_region[idx] = max_val
-                    max_nt_by_region[idx] = nt_at_which_max_occurs
-                else:
+            # print(top_n_maxs_to_find)
+            indxs_and_values = list(reversed(top_n_maxs_to_find)) # list of n max (idx,val) tuples, descending
+            # print(indxs_and_values)
+            for local_idx, val in indxs_and_values:
+                if val == -1000:
                     continue
+                nt_at_which_max_occurs = sequence[region[local_idx]]
+                rnagym_nt = row['aligned_rnagym_seq'][region[local_idx] + start]
+                if rnagym_nt != nt_at_which_max_occurs:
+                    continue
+                region_tuples = max_by_region[idx]
+                region_nts = max_nt_by_region[idx]
+                existing_pos = next((i for i, t in enumerate(region_tuples) if t[0] == local_idx), None)
+                # print(existing_pos)
+                if existing_pos is not None:
+                    if val > region_tuples[existing_pos][1]:
+                        region_tuples.pop(existing_pos)
+                        region_nts.pop(existing_pos)
+                        insert_pos = bisect.bisect_left([t[1] for t in region_tuples], val)
+                        region_tuples.insert(insert_pos, (local_idx, val))
+                        region_nts.insert(insert_pos, nt_at_which_max_occurs)
+                else:
+                    if len(region_tuples) < n_maxs_to_find:
+                        insert_pos = bisect.bisect_left([t[1] for t in region_tuples], val)
+                        region_tuples.insert(insert_pos, (local_idx, val))
+                        region_nts.insert(insert_pos, nt_at_which_max_occurs)
+                    elif val > region_tuples[0][1]:
+                        region_tuples.pop(0)
+                        region_nts.pop(0)
+                        insert_pos = bisect.bisect_left([t[1] for t in region_tuples], val)
+                        region_tuples.insert(insert_pos, (local_idx, val))
+                        region_nts.insert(insert_pos, nt_at_which_max_occurs)
+                # print(region_tuples)
+                # print(region_nts)
     # if pdb_id=='1il2':
     #     print(f"unpaired_regions: {unpaired_regions}")
     #     print(f"max_by_region: {max_by_region}")
     #     print(f"max_nt_by_region: {max_nt_by_region}")
-    nts_at_which_max_occurs.extend(max_nt_by_region)
-    nts_at_which_max_occurs = [nt for nt in nts_at_which_max_occurs if nt != ""] # filter out empty chars
-    # for nt_or_blank in nts_at_which_max_occurs:
-    for nt, max_val in zip(max_nt_by_region, max_by_region):
-        if nt in max_by_nt: # there could be an empty char if no max was found for a region
-            max_by_nt[nt].append(max_val)
+
+    # print(max_by_region)
+    # print(max_nt_by_region)
+    for region_nts in max_nt_by_region:
+        nts_at_which_max_occurs.extend(region_nts)
+    for region_nts, region_tuples in zip(max_nt_by_region, max_by_region):
+        for nt, (local_idx, val) in zip(region_nts, region_tuples):
+            if nt in max_by_nt:
+                max_by_nt[nt].append(val)
 
 print(len_mismatch_count)
 print(gap_pdbseq_count)
