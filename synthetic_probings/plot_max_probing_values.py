@@ -43,7 +43,7 @@ import matplotlib.pyplot as plt
 # 	return [v for v in values if v != SENTINEL_MISSING]
 
 
-def plot_max_probing_histograms(max_probing_dict, bins=40):
+def plot_max_probing_histograms(max_probing_dict, experiment, bins=40):
 	nts_order = ["A", "C", "G", "U"]
 	colors = {
 		"A": "#d95f02",
@@ -68,12 +68,12 @@ def plot_max_probing_histograms(max_probing_dict, bins=40):
 		ax.set_ylabel("Count")
 		ax.grid(alpha=0.2)
 
-	fig.suptitle(f"Distribution of max probing value by nucleotide, N={loaded_N}", fontsize=14)
+	fig.suptitle(f"Distribution of max probing value by nucleotide, N={loaded_N}, experiment={experiment}", fontsize=14)
 	fig.tight_layout()
 	return fig
 
 
-def plot_max_nt_frequency(max_nt_list):
+def plot_max_nt_frequency(max_nt_list, experiment):
 	nts_order = ["A", "C", "G", "U"]
 	counts = Counter(max_nt_list)
 	freqs = [counts.get(nt, 0) for nt in nts_order]
@@ -81,7 +81,7 @@ def plot_max_nt_frequency(max_nt_list):
 	fig, ax = plt.subplots(figsize=(7, 5))
 	bars = ax.bar(nts_order, freqs, color=["#d95f02", "#1b9e77", "#7570b3", "#e7298a"])
 
-	ax.set_title(f"Frequency of nucleotide with max probing, N={loaded_N}")
+	ax.set_title(f"Frequency of nucleotide with max probing, N={loaded_N}, experiment={experiment}")
 	ax.set_xlabel("Nucleotide")
 	ax.set_ylabel("Count")
 	ax.grid(axis="y", alpha=0.25)
@@ -130,14 +130,25 @@ def save_figures(output_dir=None, show=False):
 	output_path = Path(output_dir) if output_dir else Path(__file__).resolve().parent
 	output_path.mkdir(parents=True, exist_ok=True)
 
-	print_max_probing_summary(loaded_max_by_nt)
+	print("DMS_MaP")
+	print_max_probing_summary(loaded_max_by_nt['DMS_MaP'])
+	print("2A3_MaP")
+	print_max_probing_summary(loaded_max_by_nt['2A3_MaP'])
 
-	probing_fig = plot_max_probing_histograms(loaded_max_by_nt, bins=40)
-	probing_file = output_path / "max_probing_by_nt_histograms.png"
+	probing_fig = plot_max_probing_histograms(loaded_max_by_nt['DMS_MaP'], experiment="DMS_MaP", bins=40)
+	probing_file = output_path / "max_probing_by_nt_histograms_DMS.png"
 	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
 
-	max_nt_fig = plot_max_nt_frequency(loaded_nts)
-	max_nt_file = output_path / "max_nt_frequency_histogram.png"
+	probing_fig = plot_max_probing_histograms(loaded_max_by_nt['2A3_MaP'], experiment="2A3_MaP", bins=40)
+	probing_file = output_path / "max_probing_by_nt_histograms_2A3.png"
+	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
+
+	max_nt_fig = plot_max_nt_frequency(loaded_nts['DMS_MaP'], experiment="DMS_MaP")
+	max_nt_file = output_path / "max_nt_frequency_histogram_DMS.png"
+	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
+
+	max_nt_fig = plot_max_nt_frequency(loaded_nts['2A3_MaP'], experiment="2A3_MaP")
+	max_nt_file = output_path / "max_nt_frequency_histogram_2A3.png"
 	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
 
 	if show:

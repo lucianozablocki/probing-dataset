@@ -22,9 +22,13 @@ def find_alignment_bounds(alignment_seqB):
 gap_pdbseq_count=0
 gap_rnagymseq_count=0
 len_mismatch_count=0
+unknown_experiment_count=0
 grouped_df=structure_and_probing_df.groupby(['pdb_id','chain'])
-nts_at_which_max_occurs=[]
-max_by_nt={'A': [], 'C': [], 'G': [], 'U': []}
+nts_at_which_max_occurs={'DMS_MaP': [], '2A3_MaP': []}
+max_by_nt={
+    'DMS_MaP': {'A': [], 'C': [], 'G': [], 'U': []},
+    '2A3_MaP': {'A': [], 'C': [], 'G': [], 'U': []},
+}
 total_processed_rows=0
 N=5 # we will look for as many max values as floor(len(region)/N)
 for (pdb_id, chain), group in grouped_df:
@@ -51,8 +55,8 @@ for (pdb_id, chain), group in grouped_df:
     if current_region:
         unpaired_regions.append(current_region)
     # print(unpaired_regions)
-    max_by_region=[[] for _ in unpaired_regions]
-    max_nt_by_region=[[] for _ in unpaired_regions]
+    max_by_region={'DMS_MaP': [[] for _ in unpaired_regions], '2A3_MaP': [[] for _ in unpaired_regions]}
+    max_nt_by_region={'DMS_MaP': [[] for _ in unpaired_regions], '2A3_MaP': [[] for _ in unpaired_regions]}
     # print(max_by_region)
     for row in row_as_dict:
         total_processed_rows+=1
@@ -72,6 +76,11 @@ for (pdb_id, chain), group in grouped_df:
             # print(f"gap for rnagym {row['pdb_id']}")
             gap_rnagymseq_count+=1
             break
+        experiment = row['experiment']
+        if experiment != 'DMS_MaP' and experiment != '2A3_MaP':
+            print(f"Unknown experiment type: {experiment}")
+            unknown_experiment_count+=1
+            continue
         for idx, region in enumerate(unpaired_regions):
             # print(f"analyzing region {region}")
             region_len=len(region)
@@ -92,8 +101,8 @@ for (pdb_id, chain), group in grouped_df:
                 rnagym_nt = row['aligned_rnagym_seq'][region[local_idx] + start]
                 if rnagym_nt != nt_at_which_max_occurs:
                     continue
-                region_tuples = max_by_region[idx]
-                region_nts = max_nt_by_region[idx]
+                region_tuples = max_by_region[experiment][idx]
+                region_nts = max_nt_by_region[experiment][idx]
                 existing_pos = next((i for i, t in enumerate(region_tuples) if t[0] == local_idx), None)
                 # print(existing_pos)
                 if existing_pos is not None:
@@ -123,16 +132,18 @@ for (pdb_id, chain), group in grouped_df:
 
     # print(max_by_region)
     # print(max_nt_by_region)
-    for region_nts in max_nt_by_region:
-        nts_at_which_max_occurs.extend(region_nts)
-    for region_nts, region_tuples in zip(max_nt_by_region, max_by_region):
-        for nt, (local_idx, val) in zip(region_nts, region_tuples):
-            if nt in max_by_nt:
-                max_by_nt[nt].append(val)
+    for experiment in ['DMS_MaP', '2A3_MaP']:
+        for region_nts in max_nt_by_region[experiment]:
+            nts_at_which_max_occurs[experiment].extend(region_nts)
+        for region_nts, region_tuples in zip(max_nt_by_region[experiment], max_by_region[experiment]):
+            for nt, (local_idx, val) in zip(region_nts, region_tuples):
+                if nt in max_by_nt[experiment]:
+                    max_by_nt[experiment][nt].append(val)
 
-print(len_mismatch_count)
-print(gap_pdbseq_count)
-print(gap_rnagymseq_count)
+print(f"len_mismatch_count: {len_mismatch_count}")
+print(f"gap_pdbseq_count: {gap_pdbseq_count}")
+print(f"gap_rnagymseq_count: {gap_rnagymseq_count}")
+print(f"unknown experiment count: {unknown_experiment_count}")
 print("\n")
 print(max_by_nt)
 print(nts_at_which_max_occurs)
