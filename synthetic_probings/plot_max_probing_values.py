@@ -33,6 +33,7 @@ from pathlib import Path
 from statistics import mean, median, stdev
 
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 # SENTINEL_MISSING = -1000.0
@@ -62,7 +63,16 @@ def plot_max_probing_histograms(max_probing_dict, experiment, bins=40):
 			ax.set_title(f"{nt} (n=0)")
 			continue
 
-		ax.hist(values, bins=bins, color=colors[nt], alpha=0.8, edgecolor="black")
+		sns.histplot(
+			values,
+			bins=bins,
+			kde=True,
+			stat="count",
+			color=colors[nt],
+			alpha=0.8,
+			edgecolor="black",
+			ax=ax,
+		)
 		ax.set_title(f"{nt} max probing values (n={len(values)})")
 		ax.set_xlabel("Max probing value")
 		ax.set_ylabel("Count")
@@ -136,19 +146,19 @@ def save_figures(output_dir=None, show=False):
 	print_max_probing_summary(loaded_max_by_nt['2A3_MaP'])
 
 	probing_fig = plot_max_probing_histograms(loaded_max_by_nt['DMS_MaP'], experiment="DMS_MaP", bins=40)
-	probing_file = output_path / "max_probing_by_nt_histograms_DMS.png"
+	probing_file = output_path / "max_probing_by_nt_histograms_DMS_synth_N5.png"
 	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
 
 	probing_fig = plot_max_probing_histograms(loaded_max_by_nt['2A3_MaP'], experiment="2A3_MaP", bins=40)
-	probing_file = output_path / "max_probing_by_nt_histograms_2A3.png"
+	probing_file = output_path / "max_probing_by_nt_histograms_2A3_synth_N5.png"
 	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
 
 	max_nt_fig = plot_max_nt_frequency(loaded_nts['DMS_MaP'], experiment="DMS_MaP")
-	max_nt_file = output_path / "max_nt_frequency_histogram_DMS.png"
+	max_nt_file = output_path / "max_nt_frequency_histogram_DMS_synth_N5.png"
 	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
 
 	max_nt_fig = plot_max_nt_frequency(loaded_nts['2A3_MaP'], experiment="2A3_MaP")
-	max_nt_file = output_path / "max_nt_frequency_histogram_2A3.png"
+	max_nt_file = output_path / "max_nt_frequency_histogram_2A3_synth_N5.png"
 	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
 
 	if show:
