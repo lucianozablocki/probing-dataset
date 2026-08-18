@@ -17,19 +17,20 @@
 import json
 from pathlib import Path
 
-output_path = Path(__file__).resolve().parent / "synthetic_probing_results_N5.json"
+input_path_1 = Path(__file__).resolve().parent / "experimental_probing_results_N5_fixdms.json"
+input_path_2 = Path(__file__).resolve().parent / "synthetic_probing_results_N5.json"
 
 def load_synthetic_probing_results(path):
     with open(path, 'r', encoding='utf-8') as f:
         data = json.load(f)
     return data['N'], data['max_by_nt'], data['nts_at_which_max_occurs']
 
-# Example usage:
-loaded_N, loaded_max_by_nt, loaded_nts = load_synthetic_probing_results(output_path)
+# Default usage with two JSONs for overlay plots.
+loaded_N_1, loaded_max_by_nt_1, loaded_nts_1 = load_synthetic_probing_results(input_path_1)
+loaded_N_2, loaded_max_by_nt_2, loaded_nts_2 = load_synthetic_probing_results(input_path_2)
 
 
 from collections import Counter
-from pathlib import Path
 from statistics import mean, median, stdev
 
 import matplotlib.pyplot as plt
@@ -44,7 +45,16 @@ import seaborn as sns
 # 	return [v for v in values if v != SENTINEL_MISSING]
 
 
-def plot_max_probing_histograms(max_probing_dict, experiment, bins=40):
+def plot_max_probing_histograms(
+	max_probing_dict_1,
+	max_probing_dict_2,
+	experiment,
+	label_1,
+	label_2,
+	n_1,
+	n_2,
+	bins=40,
+):
 	nts_order = ["A", "C", "G", "U"]
 	colors = {
 		"A": "#d95f02",
@@ -57,28 +67,52 @@ def plot_max_probing_histograms(max_probing_dict, experiment, bins=40):
 	axes = axes.flatten()
 
 	for ax, nt in zip(axes, nts_order):
-		values = [v for v in max_probing_dict.get(nt, [])]
-		if not values:
+		values_1 = [v for v in max_probing_dict_1.get(nt, [])]
+		values_2 = [v for v in max_probing_dict_2.get(nt, [])]
+		if not values_1 and not values_2:
 			ax.text(0.5, 0.5, f"No data for {nt}", ha="center", va="center")
 			ax.set_title(f"{nt} (n=0)")
 			continue
 
-		sns.histplot(
-			values,
-			bins=bins,
-			kde=True,
-			stat="count",
-			color=colors[nt],
-			alpha=0.8,
-			edgecolor="black",
-			ax=ax,
-		)
-		ax.set_title(f"{nt} max probing values (n={len(values)})")
+		if values_1:
+			sns.histplot(
+				values_1,
+				bins=bins,
+				kde=True,
+				stat="count",
+				color=colors[nt],
+				alpha=0.35,
+				edgecolor="black",
+				label=f"{label_1} (n={len(values_1)})",
+				ax=ax,
+			)
+
+		if values_2:
+			sns.histplot(
+				values_2,
+				bins=bins,
+				kde=True,
+				stat="count",
+				color=colors[nt],
+				alpha=0.7,
+				edgecolor="white",
+				label=f"{label_2} (n={len(values_2)})",
+				ax=ax,
+			)
+
+		ax.set_title(f"{nt} max probing values")
 		ax.set_xlabel("Max probing value")
 		ax.set_ylabel("Count")
 		ax.grid(alpha=0.2)
+		ax.legend(frameon=False)
 
-	fig.suptitle(f"Distribution of max probing value by nucleotide, N={loaded_N}, experiment={experiment}", fontsize=14)
+	fig.suptitle(
+		(
+			f"Distribution of max probing value by nucleotide, "
+			f"experiment={experiment}, {label_1} (N={n_1}) vs {label_2} (N={n_2})"
+		),
+		fontsize=13,
+	)
 	fig.tight_layout()
 	return fig
 
@@ -91,7 +125,7 @@ def plot_max_nt_frequency(max_nt_list, experiment):
 	fig, ax = plt.subplots(figsize=(7, 5))
 	bars = ax.bar(nts_order, freqs, color=["#d95f02", "#1b9e77", "#7570b3", "#e7298a"])
 
-	ax.set_title(f"Frequency of nucleotide with max probing, N={loaded_N}, experiment={experiment}")
+	ax.set_title(f"Frequency of nucleotide with max probing, N={loaded_N_1}, experiment={experiment}")
 	ax.set_xlabel("Nucleotide")
 	ax.set_ylabel("Count")
 	ax.grid(axis="y", alpha=0.25)
@@ -140,24 +174,50 @@ def save_figures(output_dir=None, show=False):
 	output_path = Path(output_dir) if output_dir else Path(__file__).resolve().parent
 	output_path.mkdir(parents=True, exist_ok=True)
 
-	print("DMS_MaP")
-	print_max_probing_summary(loaded_max_by_nt['DMS_MaP'])
-	print("2A3_MaP")
-	print_max_probing_summary(loaded_max_by_nt['2A3_MaP'])
+	label_1 = input_path_1.stem
+	label_2 = input_path_2.stem
 
-	probing_fig = plot_max_probing_histograms(loaded_max_by_nt['DMS_MaP'], experiment="DMS_MaP", bins=40)
-	probing_file = output_path / "max_probing_by_nt_histograms_DMS_synth_N5.png"
+	print(f"\nDMS_MaP ({label_1})")
+	print_max_probing_summary(loaded_max_by_nt_1['DMS_MaP'])
+	print(f"\nDMS_MaP ({label_2})")
+	print_max_probing_summary(loaded_max_by_nt_2['DMS_MaP'])
+	print(f"\n2A3_MaP ({label_1})")
+	print_max_probing_summary(loaded_max_by_nt_1['2A3_MaP'])
+	print(f"\n2A3_MaP ({label_2})")
+	print_max_probing_summary(loaded_max_by_nt_2['2A3_MaP'])
+
+	probing_fig = plot_max_probing_histograms(
+		loaded_max_by_nt_1['DMS_MaP'],
+		loaded_max_by_nt_2['DMS_MaP'],
+		experiment="DMS_MaP",
+		label_1=label_1,
+		label_2=label_2,
+		n_1=loaded_N_1,
+		n_2=loaded_N_2,
+		bins=40,
+	)
+	probing_file = output_path / "max_probing_by_nt_histograms_DMS_overlay.png"
 	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
 
-	probing_fig = plot_max_probing_histograms(loaded_max_by_nt['2A3_MaP'], experiment="2A3_MaP", bins=40)
-	probing_file = output_path / "max_probing_by_nt_histograms_2A3_synth_N5.png"
+	probing_fig = plot_max_probing_histograms(
+		loaded_max_by_nt_1['2A3_MaP'],
+		loaded_max_by_nt_2['2A3_MaP'],
+		experiment="2A3_MaP",
+		label_1=label_1,
+		label_2=label_2,
+		n_1=loaded_N_1,
+		n_2=loaded_N_2,
+		bins=40,
+	)
+	probing_file = output_path / "max_probing_by_nt_histograms_2A3_overlay.png"
 	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
 
-	max_nt_fig = plot_max_nt_frequency(loaded_nts['DMS_MaP'], experiment="DMS_MaP")
+	# Keep occurrence plots untouched for now: still generated from the first JSON.
+	max_nt_fig = plot_max_nt_frequency(loaded_nts_1['DMS_MaP'], experiment="DMS_MaP")
 	max_nt_file = output_path / "max_nt_frequency_histogram_DMS_synth_N5.png"
 	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
 
-	max_nt_fig = plot_max_nt_frequency(loaded_nts['2A3_MaP'], experiment="2A3_MaP")
+	max_nt_fig = plot_max_nt_frequency(loaded_nts_1['2A3_MaP'], experiment="2A3_MaP")
 	max_nt_file = output_path / "max_nt_frequency_histogram_2A3_synth_N5.png"
 	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
 
