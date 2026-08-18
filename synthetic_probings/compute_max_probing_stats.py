@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-structure_and_probing_df = pd.read_csv('structure_and_probing.csv')
+structure_and_probing_df = pd.read_csv('synthetic_probing_noised.csv')
 
 def find_alignment_bounds(alignment_seqB):
     """Find start and end of seqB in the alignment (first/last non-gap positions)."""
@@ -23,6 +23,7 @@ gap_pdbseq_count=0
 gap_rnagymseq_count=0
 len_mismatch_count=0
 unknown_experiment_count=0
+not_matching_nts=0
 grouped_df=structure_and_probing_df.groupby(['pdb_id','chain'])
 nts_at_which_max_occurs={'DMS_MaP': [], '2A3_MaP': []}
 max_by_nt={
@@ -60,22 +61,25 @@ for (pdb_id, chain), group in grouped_df:
     # print(max_by_region)
     for row in row_as_dict:
         total_processed_rows+=1
+        # print(total_processed_rows)
         # print(f"row: {row}")
-        start, end = find_alignment_bounds(row['aligned_pdb_seq'])
+        # start, end = find_alignment_bounds(row['aligned_pdb_seq'])
+        start = 0
+        end = len(sequence)-1
         # print(start)
         # print(end)
         # print("---------------")
         if not (len(dot_bracket) == len(sequence) == (end - start + 1)):
             len_mismatch_count+=1
             break
-        if '-' in row['aligned_pdb_seq'][start:end+1]:
-            # print(f"gap for pdb {row['pdb_id']}")
-            gap_pdbseq_count+=1
-            break
-        if '-' in row['aligned_rnagym_seq'][start:end+1]:
-            # print(f"gap for rnagym {row['pdb_id']}")
-            gap_rnagymseq_count+=1
-            break
+        # if '-' in row['aligned_pdb_seq'][start:end+1]:
+        #     # print(f"gap for pdb {row['pdb_id']}")
+        #     gap_pdbseq_count+=1
+        #     break
+        # if '-' in row['aligned_rnagym_seq'][start:end+1]:
+        #     # print(f"gap for rnagym {row['pdb_id']}")
+        #     gap_rnagymseq_count+=1
+        #     break
         experiment = row['experiment']
         if experiment != 'DMS_MaP' and experiment != '2A3_MaP':
             print(f"Unknown experiment type: {experiment}")
@@ -90,7 +94,10 @@ for (pdb_id, chain), group in grouped_df:
             n_maxs_to_find = math.ceil(region_len/N)
             # print(n_maxs_to_find)
             indexed = list(enumerate(probing_values))
+            # print(sorted(indexed, key=operator.itemgetter(1)))
+            # print(n_maxs_to_find)
             top_n_maxs_to_find = sorted(indexed, key=operator.itemgetter(1))[-n_maxs_to_find:]
+            # print(top_n_maxs_to_find)
             # print(top_n_maxs_to_find)
             indxs_and_values = list(reversed(top_n_maxs_to_find)) # list of n max (idx,val) tuples, descending
             # print(indxs_and_values)
@@ -98,8 +105,17 @@ for (pdb_id, chain), group in grouped_df:
                 if val == -1000:
                     continue
                 nt_at_which_max_occurs = sequence[region[local_idx]]
-                rnagym_nt = row['aligned_rnagym_seq'][region[local_idx] + start]
-                if rnagym_nt != nt_at_which_max_occurs:
+                # rnagym_nt = row['aligned_rnagym_seq'][region[local_idx] + start]
+                # if rnagym_nt != nt_at_which_max_occurs:
+                #     not_matching_nts+=1
+                #     continue
+                # print(nt_at_which_max_occurs)
+                if nt_at_which_max_occurs in ['G', 'U'] and experiment == 'DMS_MaP':
+                    # print(indxs_and_values)
+                    # print(f"region: {region}")
+                    # print(f"sequence: {sequence}")
+                    # # DMS does not affect G and U bases, 
+                    # raise Exception("we shouldnt find G and U maximums in synth DMS data")
                     continue
                 region_tuples = max_by_region[experiment][idx]
                 region_nts = max_nt_by_region[experiment][idx]
@@ -144,12 +160,14 @@ print(f"len_mismatch_count: {len_mismatch_count}")
 print(f"gap_pdbseq_count: {gap_pdbseq_count}")
 print(f"gap_rnagymseq_count: {gap_rnagymseq_count}")
 print(f"unknown experiment count: {unknown_experiment_count}")
+print(f"not_matching_nts: {not_matching_nts}")
+
 print("\n")
 print(max_by_nt)
 print(nts_at_which_max_occurs)
 print(f"Total processed rows: {total_processed_rows}")
 
-output_path = Path(__file__).resolve().parent / f"synthetic_probing_results_N{N}.json"
+output_path = Path(__file__).resolve().parent / f"synthetic_probing_results_N{N}_noised.json"
 payload = {
     'N': N,
     'max_by_nt': max_by_nt,
