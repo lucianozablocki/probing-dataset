@@ -18,7 +18,7 @@ import json
 from pathlib import Path
 
 input_path_1 = Path(__file__).resolve().parent / "experimental_probing_results_N5_fixdms.json"
-input_path_2 = Path(__file__).resolve().parent / "synthetic_probing_results_N5.json"
+input_path_2 = Path(__file__).resolve().parent / "synthetic_probing_results_N5_noised.json"
 
 def load_synthetic_probing_results(path):
     with open(path, 'r', encoding='utf-8') as f:
@@ -34,6 +34,7 @@ from collections import Counter
 from statistics import mean, median, stdev
 
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 import seaborn as sns
 
 
@@ -117,26 +118,84 @@ def plot_max_probing_histograms(
 	return fig
 
 
-def plot_max_nt_frequency(max_nt_list, experiment):
+def plot_max_nt_frequency_comparison(
+	max_nt_list_1,
+	max_nt_list_2,
+	experiment,
+	label_1,
+	label_2,
+	n_1,
+	n_2,
+):
 	nts_order = ["A", "C", "G", "U"]
-	counts = Counter(max_nt_list)
-	freqs = [counts.get(nt, 0) for nt in nts_order]
+	colors = ["#d95f02", "#1b9e77", "#7570b3", "#e7298a"]
+	counts_1 = Counter(max_nt_list_1)
+	counts_2 = Counter(max_nt_list_2)
+	freqs_1 = [counts_1.get(nt, 0) for nt in nts_order]
+	freqs_2 = [counts_2.get(nt, 0) for nt in nts_order]
+
+	x = [0, 1, 2, 3]
+	width = 0.38
 
 	fig, ax = plt.subplots(figsize=(7, 5))
-	bars = ax.bar(nts_order, freqs, color=["#d95f02", "#1b9e77", "#7570b3", "#e7298a"])
+	bars_1 = ax.bar(
+		[i - width / 2 for i in x],
+		freqs_1,
+		width=width,
+		color=colors,
+		alpha=0.9,
+		edgecolor="black",
+		linewidth=0.7,
+	)
+	bars_2 = ax.bar(
+		[i + width / 2 for i in x],
+		freqs_2,
+		width=width,
+		color=colors,
+		alpha=0.5,
+		hatch="//",
+		edgecolor="black",
+		linewidth=0.7,
+	)
 
-	ax.set_title(f"Frequency of nucleotide with max probing, N={loaded_N_1}, experiment={experiment}")
+	ax.set_xticks(x)
+	ax.set_xticklabels(nts_order)
+
+	ax.set_title(
+		(
+			f"Frequency of nucleotide with max probing, experiment={experiment}, "
+			f"{label_1} (N={n_1}) vs {label_2} (N={n_2})"
+		)
+	)
 	ax.set_xlabel("Nucleotide")
 	ax.set_ylabel("Count")
 	ax.grid(axis="y", alpha=0.25)
+	ax.legend(
+		handles=[
+			Patch(facecolor="gray", edgecolor="black", alpha=0.9, label=label_1),
+			Patch(facecolor="gray", edgecolor="black", alpha=0.5, hatch="//", label=label_2),
+		],
+		frameon=False,
+	)
 
-	for bar, count in zip(bars, freqs):
+	for bar, count in zip(bars_1, freqs_1):
 		ax.text(
 			bar.get_x() + bar.get_width() / 2,
 			bar.get_height(),
 			str(count),
 			ha="center",
 			va="bottom",
+			fontsize=9,
+		)
+
+	for bar, count in zip(bars_2, freqs_2):
+		ax.text(
+			bar.get_x() + bar.get_width() / 2,
+			bar.get_height(),
+			str(count),
+			ha="center",
+			va="bottom",
+			fontsize=9,
 		)
 
 	fig.tight_layout()
@@ -196,7 +255,7 @@ def save_figures(output_dir=None, show=False):
 		n_2=loaded_N_2,
 		bins=40,
 	)
-	probing_file = output_path / "max_probing_by_nt_histograms_DMS_overlay.png"
+	probing_file = output_path / "max_probing_by_nt_histograms_DMS_overlay_noised.png"
 	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
 
 	probing_fig = plot_max_probing_histograms(
@@ -209,16 +268,31 @@ def save_figures(output_dir=None, show=False):
 		n_2=loaded_N_2,
 		bins=40,
 	)
-	probing_file = output_path / "max_probing_by_nt_histograms_2A3_overlay.png"
+	probing_file = output_path / "max_probing_by_nt_histograms_2A3_overlay_noised.png"
 	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
 
-	# Keep occurrence plots untouched for now: still generated from the first JSON.
-	max_nt_fig = plot_max_nt_frequency(loaded_nts_1['DMS_MaP'], experiment="DMS_MaP")
-	max_nt_file = output_path / "max_nt_frequency_histogram_DMS_synth_N5.png"
+	max_nt_fig = plot_max_nt_frequency_comparison(
+		loaded_nts_1['DMS_MaP'],
+		loaded_nts_2['DMS_MaP'],
+		experiment="DMS_MaP",
+		label_1=label_1,
+		label_2=label_2,
+		n_1=loaded_N_1,
+		n_2=loaded_N_2,
+	)
+	max_nt_file = output_path / "max_nt_frequency_histogram_DMS_overlay_noised.png"
 	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
 
-	max_nt_fig = plot_max_nt_frequency(loaded_nts_1['2A3_MaP'], experiment="2A3_MaP")
-	max_nt_file = output_path / "max_nt_frequency_histogram_2A3_synth_N5.png"
+	max_nt_fig = plot_max_nt_frequency_comparison(
+		loaded_nts_1['2A3_MaP'],
+		loaded_nts_2['2A3_MaP'],
+		experiment="2A3_MaP",
+		label_1=label_1,
+		label_2=label_2,
+		n_1=loaded_N_1,
+		n_2=loaded_N_2,
+	)
+	max_nt_file = output_path / "max_nt_frequency_histogram_2A3_overlay_noised.png"
 	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
 
 	if show:
