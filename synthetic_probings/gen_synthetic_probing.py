@@ -8,6 +8,12 @@ import pandas as pd
 import random
 import numpy as np
 import time
+
+RNG_SEED = 42
+if RNG_SEED is not None:
+    random.seed(RNG_SEED)
+    np.random.seed(RNG_SEED)
+
 structure_and_probing_df = pd.read_csv('../structure_and_probing.csv')
 # synth_probing_dict = {
 #     "pdb_id":
@@ -77,6 +83,22 @@ nts_probing_values_and_weights_by_experiment={
     }
 }
 
+
+def low_pass_filter(signal, kernel=None):
+    """Apply a simple low-pass filter (weighted moving average)."""
+    if kernel is None:
+        kernel = np.array([1.0, 2.0, 1.0], dtype=float)
+    kernel = kernel / kernel.sum()
+    signal_np = np.asarray(signal, dtype=float)
+    return np.convolve(signal_np, kernel, mode='same')
+
+
+def add_gaussian_noise(signal, mean=0.0, std=1.0):
+    """Add Gaussian noise to a signal."""
+    signal_np = np.asarray(signal, dtype=float)
+    noise = np.random.normal(loc=mean, scale=std, size=signal_np.shape)
+    return signal_np + noise
+
 def get_synth_probing_value(nt, experiment):
     nts_probing_values_and_weights=nts_probing_values_and_weights_by_experiment[experiment]
     values_and_weights=nts_probing_values_and_weights[nt]
@@ -102,7 +124,7 @@ def sort_synth_probing_values_by_nt(sequence, region, experiment, n):
         # print("positions", positions)
         # sequence[region[0]:region[-1]+1].find(nt)
         while not positions:
-            print(f"{chosen_nt} not found")
+            # print(f"{chosen_nt} not found")
             chosen_nt=random.choices(['A', 'C', 'G', 'U'], weights=nt_weights[experiment],k=1)[0]
             # print("chosen_nt", chosen_nt)
             positions=[i for i, nt in enumerate(sequence[region[0]:region[-1]+1]) if nt == chosen_nt]
@@ -205,6 +227,10 @@ for (pdb_id, chain), group in grouped_df:
             for position, value in zip(positions, synth_probing_values):
                 synth_2a3[position]=value
 
+        # Post-process each synthetic signal with smoothing + Gaussian noise.
+        synth_dms = add_gaussian_noise(low_pass_filter(synth_dms), mean=0.0, std=1.0).tolist()
+        synth_2a3 = add_gaussian_noise(low_pass_filter(synth_2a3), mean=0.0, std=1.0).tolist()
+
         synth_probing_list.append({
             "pdb_id": pdb_id,
             "chain": chain,
@@ -224,4 +250,4 @@ for (pdb_id, chain), group in grouped_df:
         })
 print(f"generated {len(synth_probing_list)} synth signals")
 df=pd.DataFrame(synth_probing_list)
-df.to_csv('synthetic_probing.csv', index=False)
+df.to_csv('synthetic_probing_noised.csv', index=False)
