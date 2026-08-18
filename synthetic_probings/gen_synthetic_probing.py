@@ -8,7 +8,7 @@ import pandas as pd
 import random
 import numpy as np
 import time
-structure_and_probing_df = pd.read_csv('structure_and_probing.csv')
+structure_and_probing_df = pd.read_csv('../structure_and_probing.csv')
 # synth_probing_dict = {
 #     "pdb_id":
 # }
@@ -85,30 +85,56 @@ def get_synth_probing_value(nt, experiment):
     # print(values_and_weights)
     return random.choices(values, weights=weights, k=1)[0]
 
-def sort_synth_probing_values_by_nt(sequence, region, experiment):
+def sort_synth_probing_values_by_nt(sequence, region, experiment, n):
+    positions=[]
+    synth_probing_list=[]
+    # print(f"generating {n} maxs for region {sequence[region[0]:region[-1]+1]} ({region[0]}-{region[-1]}) for experiment {experiment}")
     if len(region)>1:
-        nt=random.choices(['A', 'C', 'G', 'U'], weights=nt_weights[experiment],k=1)[0]
+        chosen_nt=random.choices(['A', 'C', 'G', 'U'], weights=nt_weights[experiment],k=1)[0]
+        # print(chosen_nt)
+        # for chosen_nt in chosen_nts:
+        #     positions=[i for i, nt in enumerate(sequence[region[0]:region[-1]+1]) if nt == chosen_nt]
+        #     chosen_position=random.sample(positions, 1)[0]
+        #     synth_probing_value=get_synth_probing_value(chosen_nt, experiment)
+        #     synth[chosen_position + region[0]] = synth_probing_value
         # print(sequence[region[0]:region[-1]+1])
-        pos=sequence[region[0]:region[-1]+1].find(nt)
-        # pos=-1
-        while pos==-1:
-            nt=random.choices(['A', 'C', 'G', 'U'], weights=nt_weights[experiment],k=1)[0]
-            pos=sequence[region[0]:region[-1]+1].find(nt)
-            # print(sequence[region[0]:region[-1]+1])
-            # print(nt)
-            # print(r)
-        pos += region[0]
-        assert(pos in region)
-        synth_probing_value=get_synth_probing_value(nt, experiment)
+        positions=[i for i, nt in enumerate(sequence[region[0]:region[-1]+1]) if nt == chosen_nt]
+        # print("positions", positions)
+        # sequence[region[0]:region[-1]+1].find(nt)
+        while not positions:
+            print(f"{chosen_nt} not found")
+            chosen_nt=random.choices(['A', 'C', 'G', 'U'], weights=nt_weights[experiment],k=1)[0]
+            # print("chosen_nt", chosen_nt)
+            positions=[i for i, nt in enumerate(sequence[region[0]:region[-1]+1]) if nt == chosen_nt]
+            # print(positions)
+        # take n elements randomly from positions
+        # print(len(positions))
+        # print(positions)
+        if len(positions)>=n:
+            positions=random.sample(positions, n)
+            # print("sampled positions", positions)
+            for i, pos in enumerate(positions):
+                positions[i] = pos + region[0]
+                # print(sequence[positions[i]])
+                assert(positions[i] in region)
+                synth_probing_value=get_synth_probing_value(chosen_nt, experiment)
+                synth_probing_list.append(synth_probing_value)
+                # print(len(synth_probing_list))
+        else:
+            for i, pos in enumerate(positions):
+                positions[i] = pos + region[0]
+                assert(positions[i] in region)
+                synth_probing_value=get_synth_probing_value(chosen_nt, experiment)
+                synth_probing_list.append(synth_probing_value)
     else:
         # print("short region")
-        pos=region[0]
-        nt=sequence[pos]
+        positions=[region[0]]
+        chosen_nt=sequence[positions[0]]
         # print(pos)
         # print(nt)
-        synth_probing_value=get_synth_probing_value(nt, experiment)
+        synth_probing_list=[get_synth_probing_value(chosen_nt, experiment)]
         # print(synth_probing_value)
-    return pos, synth_probing_value
+    return positions, synth_probing_list
 
 
 def find_alignment_bounds(alignment_seqB):
@@ -137,6 +163,8 @@ for (pdb_id, chain), group in grouped_df:
     unpaired_regions = []
     # if pdb_id!='6zmo' or chain!='CB':
     #     continue
+    # if pdb_id!='1duh' or chain!='A':
+    #     continue
     print(f"Processing pdb_id={pdb_id}, chain={chain}")
     dot_bracket = group.iloc[0]['dot_bracket']
     sequence = group.iloc[0]['sequence']
@@ -161,18 +189,21 @@ for (pdb_id, chain), group in grouped_df:
         synth_dms = [0]*len(sequence)
         synth_2a3 = [0]*len(sequence)
         for r in unpaired_regions:
+            # print(r)
             region_len = len(r)
-            # n_maxs_to_find = math.ceil(region_len/N)
+            n_maxs_to_gen = math.ceil(region_len/N)
             # print("dms")
             if (not sequence[r[0]:r[-1]+1].find('A')==-1 or not sequence[r[0]:r[-1]+1].find('C')==-1):
                 # for _ in range(n_maxs_to_find):
-                pos, synth_probing_value = sort_synth_probing_values_by_nt(sequence, r, 'DMS_MaP')
-                synth_dms[pos]=synth_probing_value
+                positions, synth_probing_values = sort_synth_probing_values_by_nt(sequence, r, 'DMS_MaP', n_maxs_to_gen)
+                for position, value in zip(positions, synth_probing_values):
+                    synth_dms[position]=value
 
             # print("2a3")
             # for _ in range(n_maxs_to_find):
-            pos, synth_probing_value = sort_synth_probing_values_by_nt(sequence, r, '2A3_MaP')
-            synth_2a3[pos]=synth_probing_value
+            positions, synth_probing_values = sort_synth_probing_values_by_nt(sequence, r, '2A3_MaP', n_maxs_to_gen)
+            for position, value in zip(positions, synth_probing_values):
+                synth_2a3[position]=value
 
         synth_probing_list.append({
             "pdb_id": pdb_id,
@@ -192,5 +223,5 @@ for (pdb_id, chain), group in grouped_df:
             "dot_bracket": dot_bracket,
         })
 print(f"generated {len(synth_probing_list)} synth signals")
-# df=pd.DataFrame(synth_probing_list)
-# df.to_csv('synthetic_probing.csv', index=False)
+df=pd.DataFrame(synth_probing_list)
+df.to_csv('synthetic_probing.csv', index=False)
