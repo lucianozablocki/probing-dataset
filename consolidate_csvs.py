@@ -1,8 +1,8 @@
 import pandas as pd
 
-TOOL_MISMATCH_PATH="tool_mismatch.csv"
-PDB_GAPS_PATH="alignments_seqb_gaps_removed.csv"
-NO_MODIFIED_PATH="alignments_rows_completed.csv"
+TOOL_MISMATCH_PATH="rnaglib_rnapdbee_diff/tool_mismatch.csv"
+PDB_GAPS_PATH="pdb_gaps/alignments_seqb_gaps_removed.csv"
+NO_MODIFIED_PATH="no_transformations/alignments_rows_completed.csv"
 
 TOOL_MISMATCH=['9f9s', '5axm', '7mky', '1e8o', '5ns3', '7d8o', '6prv', '1xjr', '4oqu', '1l2x', '4mgn', '7k16', '5d5l', '4jf2', '6cu1', '5e81', '7n2v', '7zta', '3k1v', '8yup', '5ju8', '6fz0', '5aox', '8v1i', '6mwn', '1y27', '6xko', '8peg', '8g9z']
 SEQB_GAPS=['7mlx', '1mms', '5nwq', '5d8h', '5gah', '1il2', '5lzs', '6r5q', '5lys', '6pmo', '3r4f', '3npq', '8am9', '6zym', '8r6c', '8d9k', '5el4', '5ml7', '1l9a', '7p6z', '3kfu', '8s1p', '6mj0', '5ib8', '7d6z', '6wzr', '7mdl', '8k1e']
