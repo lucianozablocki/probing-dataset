@@ -11,7 +11,7 @@ df = pd.read_parquet(PARQUET_URL)
 
 struct_df = pd.read_csv("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/rna_pdb_dataset_bp.csv")
 
-chain_df = pd.read_csv("alignments_with_chain.csv")
+chain_df = pd.read_csv("../multi_chain_analysis/alignments_with_chain.csv")
 # print(df.columns)
 SEQB_GAPS=['7mlx', '1mms', '5nwq', '5d8h', '5gah', '1il2', '5lzs', '6r5q', '5lys', '6pmo', '3r4f', '3npq', '8am9', '6zym', '8r6c', '8d9k', '5el4', '5ml7', '1l9a', '7p6z', '3kfu', '8s1p', '6mj0', '5ib8', '7d6z', '6wzr', '7mdl', '8k1e']
 UPDATED_ALIGNMENTS_TOOLDIFF=["1e8o", "4jf2", "4mgn", "4mgn", "4mgn", "5aox", "5axm", "5d5l", "6prv", "6xko", "7k16", "7n2v", "8peg", "8v1i", "8v1i", "3k1v", "4mgn", "5aox", "5ns3", "7d8o", "7mky", "8g9z",]
@@ -83,7 +83,7 @@ for pdb_id_with_gap in SEQB_GAPS:
             updated['score'] = row['local_alignment_score_bymin']
             updated['experiment'] = row['experiment_type']
             updated['chain'] = chain
-
+            # print(row['experiment_type'])
             results.append(updated)
             # results.append(row.to_dict())
             # raise Exception(f"no gaps inside alignment for pdb {pdb_id_with_gap}, this is an issue")
@@ -114,6 +114,7 @@ for pdb_id_with_gap in SEQB_GAPS:
         updated['reactivity'] = reactivity
         updated['reactivity_errors'] = reactivity_errors
         updated['score'] = row['local_alignment_score_bymin']
+        updated['experiment'] = row['experiment_type']
         updated['chain'] = chain
 
         results.append(updated)
