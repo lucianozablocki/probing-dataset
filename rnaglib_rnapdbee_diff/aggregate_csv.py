@@ -15,8 +15,8 @@ import pandas as pd
 
 rnagym_alignments_complete_df = pd.read_parquet("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/rnagym_vs_rnapdb_alignments_postprocessed.parquet")
 struct_df = pd.read_csv("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/rna_pdb_dataset_bp.csv")
-chain_df = pd.read_csv("alignments_with_chain.csv")
-folder_path='rnaglib_rnapdbee_diff/updated_aligments'
+chain_df = pd.read_csv("../multi_chain_analysis/alignments_with_chain.csv")
+folder_path='updated_aligments'
 
 results=[]
 import ast
@@ -96,10 +96,36 @@ for item in os.listdir(folder_path):
         updated['sequence'] = sequence.values[0]
         updated['base_pairs'] = base_pairs.values[0]
 
+        # kept only to name the offending files if two of them describe the
+        # same alignment; dropped before writing
+        updated['_source_file'] = item
+
         results.append(updated)
 
 # write results to csv
 out_df = pd.DataFrame(results)
+
+# One alignment must come from exactly one file. Two files describing the same
+# <pdb_id, rnagym_id, experiment> means a superseded round of deletions is still
+# in the folder, and whichever row survives downstream deduplication is a coin
+# flip -- that is how a partially-corrected 5aox reached structure_and_probing.
+KEY = ['pdb_id', 'rnagym_id', 'experiment']
+dupes = out_df[out_df.duplicated(subset=KEY, keep=False)]
+if not dupes.empty:
+    print(f"\nERROR: {dupes[KEY].drop_duplicates().shape[0]} alignment(s) produced by "
+          f"more than one file in {folder_path}:")
+    for key, group in dupes.groupby(KEY):
+        files = sorted(group['_source_file'].unique())
+        lengths = sorted(group['aligned_pdb_seq'].str.len().unique())
+        print(f"  {'/'.join(map(str, key))}: aligned_pdb_seq length(s) {lengths}")
+        for f in files:
+            print(f"      {f}")
+    raise SystemExit(
+        "Move the superseded file(s) out of the folder (see intermediate_deletions/) "
+        "and re-run."
+    )
+
+out_df = out_df.drop(columns=['_source_file'])
 out_df['reactivity'] = out_df['reactivity'].apply(lambda x: json.dumps(x.tolist()))
 out_df['reactivity_errors'] = out_df['reactivity_errors'].apply(lambda x: json.dumps(x.tolist()))
 out_df.to_csv("tool_mismatch.csv", index=False)
