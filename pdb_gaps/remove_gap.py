@@ -34,9 +34,11 @@ def find_alignment_bounds(alignment_seqB):
 results = []
 count=[]
 seen=[]
+branch_counts = {}
 for pdb_id_with_gap in SEQB_GAPS:
     print(pdb_id_with_gap)
     count_for_pdb_id=0
+    branch_counts[pdb_id_with_gap] = {"no_gap_inside": 0, "gap_removed": 0}
     if pdb_id_with_gap in UPDATED_ALIGNMENTS_TOOLDIFF:
         print(f"pdb {pdb_id_with_gap} alignment was modified, skipping")
         continue
@@ -68,6 +70,7 @@ for pdb_id_with_gap in SEQB_GAPS:
         reactivity_errors = list(row.get('reactivity_errors', []))
 
         if not inside_alignment_pos:
+            branch_counts[pdb_id_with_gap]["no_gap_inside"] += 1
             updated = {}
 
             updated['pdb_id'] = row['pdb_id']
@@ -100,6 +103,7 @@ for pdb_id_with_gap in SEQB_GAPS:
             rnagym_seq = rnagym_seq[:col] + rnagym_seq[col + 1:]
             pdb_seq = pdb_seq[:col] + pdb_seq[col + 1:]
 
+        branch_counts[pdb_id_with_gap]["gap_removed"] += 1
         # updated = row.to_dict()
         updated = {}
 
@@ -129,6 +133,9 @@ for pdb_id_with_gap in SEQB_GAPS:
 
 print(len(results))
 print(sum(count))
+print("\nper-pdb_id branch counts (rows with no gap inside alignment vs rows with a gap removed):")
+for pdb_id, counts in branch_counts.items():
+    print(f"  {pdb_id}: no_gap_inside={counts['no_gap_inside']}, gap_removed={counts['gap_removed']}")
 if results:
     out_df = pd.DataFrame(results)
     out_df['reactivity'] = out_df['reactivity'].apply(json.dumps)
