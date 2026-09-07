@@ -3,6 +3,8 @@ import pandas as pd
 TOOL_MISMATCH_PATH="rnaglib_rnapdbee_diff/tool_mismatch.csv"
 PDB_GAPS_PATH="pdb_gaps/alignments_seqb_gaps_removed.csv"
 NO_MODIFIED_PATH="no_transformations/alignments_rows_completed.csv"
+# the 18 pdb_ids remove_gap.py never reached; supersedes rows in the three above
+REMAINING_GAPS_PATH="pdb_gaps/alignments_remaining_gaps_removed.csv"
 
 TOOL_MISMATCH=['9f9s', '5axm', '7mky', '1e8o', '5ns3', '7d8o', '6prv', '1xjr', '4oqu', '1l2x', '4mgn', '7k16', '5d5l', '4jf2', '6cu1', '5e81', '7n2v', '7zta', '3k1v', '8yup', '5ju8', '6fz0', '5aox', '8v1i', '6mwn', '1y27', '6xko', '8peg', '8g9z']
 SEQB_GAPS=['7mlx', '1mms', '5nwq', '5d8h', '5gah', '1il2', '5lzs', '6r5q', '5lys', '6pmo', '3r4f', '3npq', '8am9', '6zym', '8r6c', '8d9k', '5el4', '5ml7', '1l9a', '7p6z', '3kfu', '8s1p', '6mj0', '5ib8', '7d6z', '6wzr', '7mdl', '8k1e']
@@ -16,6 +18,7 @@ PDB_IDS+=PLOTTED_PDBIDS
 tool_mismatch_df=pd.read_csv(TOOL_MISMATCH_PATH)
 pdb_gaps_df=pd.read_csv(PDB_GAPS_PATH)
 no_modified_df=pd.read_csv(NO_MODIFIED_PATH)
+remaining_gaps_df=pd.read_csv(REMAINING_GAPS_PATH)
 # print(f"len tool mismatch: {len(tool_mismatch_df)}")
 # print(f"len pdb gaps: {len(pdb_gaps_df)}")
 # print(f"len no modified: {len(no_modified_df)}")
@@ -23,14 +26,30 @@ no_modified_df=pd.read_csv(NO_MODIFIED_PATH)
 set_1=set(tool_mismatch_df.columns)
 set_2=set(pdb_gaps_df.columns)
 set_3=set(no_modified_df.columns)
+set_4=set(remaining_gaps_df.columns)
 
-assert(set_1==set_2==set_3)
+assert(set_1==set_2==set_3==set_4)
 
 # concatenate dfs
 # count how many pdb_id,chain are there
 # count how many rows
 
-res=pd.concat([tool_mismatch_df, no_modified_df, pdb_gaps_df], ignore_index=True)
+# remaining_gaps_df holds degapped copies of rows that still exist, ungapped,
+# in tool_mismatch_df and no_modified_df. Drop the superseded originals by key
+# rather than by pdb_id: only 931 of those pdb_ids' 1492 rows carried gaps, and
+# the rest must survive untouched.
+KEY = ["pdb_id", "rnagym_id", "experiment", "chain"]
+
+superseded = set(map(tuple, remaining_gaps_df[KEY].values))
+others = pd.concat([tool_mismatch_df, no_modified_df, pdb_gaps_df], ignore_index=True)
+kept = others[~others[KEY].apply(tuple, axis=1).isin(superseded)]
+print(f"superseded {len(others) - len(kept)} rows with degapped versions "
+      f"({len(remaining_gaps_df)} available)")
+assert len(others) - len(kept) == len(remaining_gaps_df), \
+    "a degapped row has no original to replace"
+
+res=pd.concat([kept, remaining_gaps_df], ignore_index=True)
+assert not res.duplicated(subset=KEY).any(), "duplicate rows after consolidation"
 print(f"probing and structure csv has {len(res)} rows")
 print(f"and {len(res.groupby(['pdb_id','chain']))} unique structures")
 
