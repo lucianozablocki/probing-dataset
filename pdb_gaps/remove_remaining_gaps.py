@@ -15,8 +15,17 @@ Output is a fourth csv for consolidate_csvs.py to merge, which supersedes the
 original rows by key. Nothing existing is edited: remove_gap.py and its
 alignments_seqb_gaps_removed.csv (a disjoint set of 28 pdb_ids) stay as they are.
 
-Reactivity is indexed by alignment column here -- postprocess_structure_and_probing.py
-crops it with alignment bounds -- so removing column i removes reactivity[i].
+Reactivity has one slot per rnagym NUCLEOTIDE, not per alignment column: it is
+copied verbatim from the parquet by complete_rows.py and aggregate_csv.py, and
+never re-indexed. So erasing alignment column i erases the reactivity value at
+i minus the number of rnagym gaps before it -- the same arithmetic remove_gap.py
+uses, kept identical here so there is one definition of the operation.
+
+Confirmed empirically: on the DMS rows where the two readings differ, grouping
+reactivity per nucleotide separates A/C from G/U by 7.8x (control: 5.1x), while
+grouping per column gives 1.6x -- the smear of an off-by-n frame shift.
+
+A column where the rnagym row is itself a gap has no reactivity value to erase.
 The arrays run past the end of the alignment (the rest of the rnagym read), and
 that tail is left alone.
 """
@@ -25,7 +34,6 @@ from ast import literal_eval
 
 import pandas as pd
 
-DIAGNOSIS = "pdb_gaps/case_diagnosis.csv"
 SOURCES = [
     "rnaglib_rnapdbee_diff/tool_mismatch.csv",
     "no_transformations/alignments_rows_completed.csv",
@@ -61,46 +69,58 @@ def interior_gap_columns(aligned_pdb_seq):
 
 
 def degap(row):
-    """Drop the interior gap columns from both alignments and both list columns."""
+    """Erase each interior gap column from the alignments and the reactivity.
+
+    Columns are removed back to front so earlier deletions do not shift the
+    indices still to be processed.
+    """
     cols = interior_gap_columns(row["aligned_pdb_seq"])
     if not cols:
         return None
 
-    seqs = {c: row[c] for c in SEQ_COLUMNS}
+    pdb_seq = row["aligned_pdb_seq"]
+    rnagym_seq = row["aligned_rnagym_seq"]
     lists = {c: literal_eval(row[c]) for c in LIST_COLUMNS}
+
     for col in sorted(cols, reverse=True):
-        for c in SEQ_COLUMNS:
-            seqs[c] = seqs[c][:col] + seqs[c][col + 1:]
-        for c in LIST_COLUMNS:
-            lists[c] = lists[c][:col] + lists[c][col + 1:]
+        if rnagym_seq[col] != "-":
+            # translate the column into an index of the ungapped rnagym sequence
+            i = col - rnagym_seq[:col].count("-")
+            for c in LIST_COLUMNS:
+                lists[c] = lists[c][:i] + lists[c][i + 1:]
+        rnagym_seq = rnagym_seq[:col] + rnagym_seq[col + 1:]
+        pdb_seq = pdb_seq[:col] + pdb_seq[col + 1:]
 
     out = row.to_dict()
-    out.update(seqs)
+    out["aligned_pdb_seq"] = pdb_seq
+    out["aligned_rnagym_seq"] = rnagym_seq
     out.update({c: json.dumps(v) for c, v in lists.items()})
     return out
 
 
 def main():
-    diag = pd.read_csv(DIAGNOSIS)
-    cases = set(map(tuple, diag[diag.seqb_gaps][["pdb_id", "chain"]].values))
-    print(f"{len(cases)} (pdb_id, chain) cases with interior gaps, "
-          f"{len({p for p, _ in cases})} pdb_ids")
+    """Fix every row in the source csvs that still carries an interior pdb gap.
 
-    results, seen_source = [], {}
+    Scanning the sources rather than a diagnosis of the final csv keeps this
+    self-contained and idempotent: once the rows are fixed there is nothing to
+    find, and a newly introduced gap is picked up without updating a list.
+    """
+    results = []
     for path in SOURCES:
         df = pd.read_csv(path)
-        hit = df[df[["pdb_id", "chain"]].apply(tuple, axis=1).isin(cases)]
         n = 0
-        for _, row in hit.iterrows():
+        for _, row in df.iterrows():
             fixed = degap(row)
             if fixed is not None:
                 results.append(fixed)
                 n += 1
-        seen_source[path] = n
-        print(f"  {path}: {len(hit)} rows in scope, {n} carried gaps")
+        print(f"  {path}: {len(df)} rows, {n} carried interior pdb gaps")
+
+    if not results:
+        print("\nno interior pdb gaps left in the sources; nothing to write")
+        return
 
     out = pd.DataFrame(results)
-    assert not out.empty, "no rows to fix"
     assert not out.duplicated(subset=KEY).any(), "a row was fixed from two sources"
 
     # postconditions: the frame is repaired and nothing else moved
@@ -108,9 +128,6 @@ def main():
     assert (ungapped == out.sequence).all(), "degapped alignment != structure sequence"
     assert not out.aligned_pdb_seq.map(interior_gap_columns).map(bool).any(), \
         "interior gaps remain"
-    lengths = out.reactivity.map(lambda v: len(literal_eval(v)))
-    assert (lengths >= out.aligned_pdb_seq.str.len()).all(), \
-        "reactivity is shorter than its alignment"
 
     out.to_csv(OUT_CSV, index=False)
     print(f"\nwrote {len(out)} rows to {OUT_CSV}")
