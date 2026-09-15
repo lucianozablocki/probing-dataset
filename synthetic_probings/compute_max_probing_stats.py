@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-structure_and_probing_df = pd.read_csv('synthetic_probing_noised.csv')
+structure_and_probing_df = pd.read_csv('../structure_and_probing.csv')
 
 def find_alignment_bounds(alignment_seqB):
     """Find start and end of seqB in the alignment (first/last non-gap positions)."""
@@ -71,15 +71,15 @@ for (pdb_id, chain), group in grouped_df:
         # print("---------------")
         if not (len(dot_bracket) == len(sequence) == (end - start + 1)):
             len_mismatch_count+=1
-            break
-        # if '-' in row['aligned_pdb_seq'][start:end+1]:
-        #     # print(f"gap for pdb {row['pdb_id']}")
-        #     gap_pdbseq_count+=1
-        #     break
-        # if '-' in row['aligned_rnagym_seq'][start:end+1]:
-        #     # print(f"gap for rnagym {row['pdb_id']}")
-        #     gap_rnagymseq_count+=1
-        #     break
+            continue
+        if '-' in row['aligned_pdb_seq'][start:end+1]:
+            # print(f"gap for pdb {row['pdb_id']}")
+            gap_pdbseq_count+=1
+            continue
+        if '-' in row['aligned_rnagym_seq'][start:end+1]:
+            # print(f"gap for rnagym {row['pdb_id']}")
+            gap_rnagymseq_count+=1
+            continue
         experiment = row['experiment']
         if experiment != 'DMS_MaP' and experiment != '2A3_MaP':
             print(f"Unknown experiment type: {experiment}")
@@ -167,7 +167,7 @@ print(max_by_nt)
 print(nts_at_which_max_occurs)
 print(f"Total processed rows: {total_processed_rows}")
 
-output_path = Path(__file__).resolve().parent / f"synthetic_probing_results_N{N}_noised.json"
+output_path = Path(__file__).resolve().parent / f"experimental_probing_results_N{N}.json"
 payload = {
     'N': N,
     'max_by_nt': max_by_nt,

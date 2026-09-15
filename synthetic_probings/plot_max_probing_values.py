@@ -18,7 +18,7 @@ import json
 from pathlib import Path
 
 input_path_1 = Path(__file__).resolve().parent / "experimental_probing_results_N5_fixdms.json"
-input_path_2 = Path(__file__).resolve().parent / "synthetic_probing_results_N5_noised.json"
+input_path_2 = Path(__file__).resolve().parent / "synthetic_probing_results_N5_noised_seed3_std.1.json"
 
 def load_synthetic_probing_results(path):
     with open(path, 'r', encoding='utf-8') as f:
@@ -35,6 +35,7 @@ from statistics import mean, median, stdev
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+import numpy as np
 import seaborn as sns
 
 
@@ -67,6 +68,37 @@ def plot_max_probing_histograms(
 	fig, axes = plt.subplots(2, 2, figsize=(12, 8), sharey=True)
 	axes = axes.flatten()
 
+	all_values = []
+	print(f"for experiment {experiment}")
+	for nt in nts_order:
+		if (nt == 'G' or nt == 'U') and experiment == 'DMS_MaP':
+			continue
+		print(f"for nt {nt}")
+		print(f"min for experimental: {min(max_probing_dict_1.get(nt, [-np.inf]))}")
+		print(f"max for experimental: {max(max_probing_dict_1.get(nt, [-np.inf]))}")
+		print(f"min for synth: {min(max_probing_dict_2.get(nt, [-np.inf]))}")
+		print(f"max for synth: {max(max_probing_dict_2.get(nt, [-np.inf]))}")
+		all_values.extend(max_probing_dict_1.get(nt, []))
+		all_values.extend(max_probing_dict_2.get(nt, []))
+
+	if not all_values:
+		fig.suptitle(
+			(
+				f"Distribution of max probing value by nucleotide, "
+				f"experiment={experiment}, {label_1} (N={n_1}) vs {label_2} (N={n_2})"
+			),
+			fontsize=13,
+		)
+		fig.tight_layout()
+		return fig
+
+	global_min = min(all_values)
+	global_max = max(all_values)
+	# if global_min == global_max:
+		# shared_bin_edges = np.array([global_min - 0.5, global_max + 0.5])
+	# else:
+	shared_bin_edges = np.linspace(global_min, global_max, bins + 1)
+
 	for ax, nt in zip(axes, nts_order):
 		values_1 = [v for v in max_probing_dict_1.get(nt, [])]
 		values_2 = [v for v in max_probing_dict_2.get(nt, [])]
@@ -78,7 +110,7 @@ def plot_max_probing_histograms(
 		if values_1:
 			sns.histplot(
 				values_1,
-				bins=bins,
+				bins=shared_bin_edges,
 				kde=True,
 				stat="count",
 				color=colors[nt],
@@ -91,7 +123,7 @@ def plot_max_probing_histograms(
 		if values_2:
 			sns.histplot(
 				values_2,
-				bins=bins,
+				bins=shared_bin_edges,
 				kde=True,
 				stat="count",
 				color=colors[nt],
@@ -255,7 +287,7 @@ def save_figures(output_dir=None, show=False):
 		n_2=loaded_N_2,
 		bins=40,
 	)
-	probing_file = output_path / "max_probing_by_nt_histograms_DMS_overlay_noised.png"
+	probing_file = output_path / "max_probing_by_nt_histograms_DMS_binedges_seed3_std.1.png"
 	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
 
 	probing_fig = plot_max_probing_histograms(
@@ -268,7 +300,7 @@ def save_figures(output_dir=None, show=False):
 		n_2=loaded_N_2,
 		bins=40,
 	)
-	probing_file = output_path / "max_probing_by_nt_histograms_2A3_overlay_noised.png"
+	probing_file = output_path / "max_probing_by_nt_histograms_2A3_binedges_seed3_std.1.png"
 	probing_fig.savefig(probing_file, dpi=300, bbox_inches="tight")
 
 	max_nt_fig = plot_max_nt_frequency_comparison(
@@ -280,7 +312,7 @@ def save_figures(output_dir=None, show=False):
 		n_1=loaded_N_1,
 		n_2=loaded_N_2,
 	)
-	max_nt_file = output_path / "max_nt_frequency_histogram_DMS_overlay_noised.png"
+	max_nt_file = output_path / "max_nt_frequency_histogram_DMS_binedges_seed3_std.1.png"
 	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
 
 	max_nt_fig = plot_max_nt_frequency_comparison(
@@ -292,7 +324,7 @@ def save_figures(output_dir=None, show=False):
 		n_1=loaded_N_1,
 		n_2=loaded_N_2,
 	)
-	max_nt_file = output_path / "max_nt_frequency_histogram_2A3_overlay_noised.png"
+	max_nt_file = output_path / "max_nt_frequency_histogram_2A3_binedges_seed3_std.1.png"
 	max_nt_fig.savefig(max_nt_file, dpi=300, bbox_inches="tight")
 
 	if show:

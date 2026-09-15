@@ -9,7 +9,7 @@ import random
 import numpy as np
 import time
 
-RNG_SEED = 42
+RNG_SEED = 3
 if RNG_SEED is not None:
     random.seed(RNG_SEED)
     np.random.seed(RNG_SEED)
@@ -228,8 +228,8 @@ for (pdb_id, chain), group in grouped_df:
                 synth_2a3[position]=value
 
         # Post-process each synthetic signal with smoothing + Gaussian noise.
-        synth_dms = add_gaussian_noise(low_pass_filter(synth_dms), mean=0.0, std=1.0).tolist()
-        synth_2a3 = add_gaussian_noise(low_pass_filter(synth_2a3), mean=0.0, std=1.0).tolist()
+        synth_dms = add_gaussian_noise(low_pass_filter(synth_dms), mean=0.0, std=0.1).tolist()
+        synth_2a3 = add_gaussian_noise(low_pass_filter(synth_2a3), mean=0.0, std=0.1).tolist()
 
         synth_probing_list.append({
             "pdb_id": pdb_id,
@@ -250,4 +250,4 @@ for (pdb_id, chain), group in grouped_df:
         })
 print(f"generated {len(synth_probing_list)} synth signals")
 df=pd.DataFrame(synth_probing_list)
-df.to_csv('synthetic_probing_noised.csv', index=False)
+df.to_csv('synthetic_probing_noised_seed3_std.1.csv', index=False)
