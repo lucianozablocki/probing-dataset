@@ -20,7 +20,7 @@ def find_alignment_bounds(alignment_seqB):
             end = idx
     return start, end
 gap_pdbseq_count=0
-gap_rnagymseq_count=0
+# gap_rnagymseq_count=0
 len_mismatch_count=0
 unknown_experiment_count=0
 not_matching_nts=0
@@ -76,10 +76,10 @@ for (pdb_id, chain), group in grouped_df:
             # print(f"gap for pdb {row['pdb_id']}")
             gap_pdbseq_count+=1
             continue
-        if '-' in row['aligned_rnagym_seq'][start:end+1]:
-            # print(f"gap for rnagym {row['pdb_id']}")
-            gap_rnagymseq_count+=1
-            continue
+        # if '-' in row['aligned_rnagym_seq'][start:end+1]:
+        #     # print(f"gap for rnagym {row['pdb_id']}")
+        #     gap_rnagymseq_count+=1
+        #     continue
         experiment = row['experiment']
         if experiment != 'DMS_MaP' and experiment != '2A3_MaP':
             print(f"Unknown experiment type: {experiment}")
@@ -105,10 +105,10 @@ for (pdb_id, chain), group in grouped_df:
                 if val == -1000:
                     continue
                 nt_at_which_max_occurs = sequence[region[local_idx]]
-                # rnagym_nt = row['aligned_rnagym_seq'][region[local_idx] + start]
-                # if rnagym_nt != nt_at_which_max_occurs:
-                #     not_matching_nts+=1
-                #     continue
+                rnagym_nt = row['aligned_rnagym_seq'][region[local_idx] + start]
+                if rnagym_nt != nt_at_which_max_occurs:
+                    not_matching_nts+=1
+                    continue
                 # print(nt_at_which_max_occurs)
                 if nt_at_which_max_occurs in ['G', 'U'] and experiment == 'DMS_MaP':
                     # print(indxs_and_values)
@@ -158,7 +158,7 @@ for (pdb_id, chain), group in grouped_df:
 
 print(f"len_mismatch_count: {len_mismatch_count}")
 print(f"gap_pdbseq_count: {gap_pdbseq_count}")
-print(f"gap_rnagymseq_count: {gap_rnagymseq_count}")
+# print(f"gap_rnagymseq_count: {gap_rnagymseq_count}")
 print(f"unknown experiment count: {unknown_experiment_count}")
 print(f"not_matching_nts: {not_matching_nts}")
 
