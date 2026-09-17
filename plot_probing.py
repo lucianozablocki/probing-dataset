@@ -1,13 +1,14 @@
+from ast import literal_eval
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import numpy as np
 import pandas as pd
-# import pyarrow
 
 plt.rcParams["figure.figsize"] = (15,3)
-rnapdb_dataset=pd.read_csv("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/rna_pdb_dataset_bp.csv")
-rnagym_seqs=pd.read_parquet("https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/rnagym_vs_rnapdb_alignments_postprocessed.parquet")
-synthetic_probings=pd.read_csv("synthetic_probings/synthetic_probing_noised_seed3_std.1.csv")
-
+structure_and_probing=pd.read_csv(
+  "https://raw.githubusercontent.com/lucianozablocki/probing-dataset/refs/heads/main/structure_and_probing.csv",
+  converters={'reactivity': literal_eval}
+)
 def find_alignment_bounds(alignment_seqB):
     """Find start and end of seqB in the alignment (first/last non-gap positions)."""
     start = None
@@ -19,7 +20,7 @@ def find_alignment_bounds(alignment_seqB):
             end = idx
     return start, end
 
-def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, save_fig=False):
+def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, probings_to_plot=None, save_fig=False):
   """
   Plot probings and pseudo-probing for a given pdb_id.
 
@@ -30,31 +31,8 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
   """
   plt.figure()
   plt.grid()
-  # the aligned sequence is the same in all alignments file row, just take the first
-  # ^ ABOVE IS NOT ALWAYS TRUE, THERE ARE MULTIPLE CHAINS FOR EACH PBD ID
-  ref_seq = rows_of_pdbid[0]['seqB']
-  # `rnapdb_rows` holds all RNA PDB dataset rows for the given pdb_id,
-  # we need to find the one that matches the aligned sequence to get the correct structure
-  rnapdb_rows=rnapdb_dataset[rnapdb_dataset['id']==pdb_id]
-  struct=None
-  # before, we were taking the first sequence from all the possible chains.
-  # changed to iterate over all pdb rows
-  for idx, rnapdb_row in rnapdb_rows.iterrows():
-    # basically find which of all the chains the alignment was run against
-    if rnapdb_row['sequence']==ref_seq:
-      struct=rnapdb_row['base_pairs']
-  # print(f"{pdb_id}")
-  # print(f"{struct}")
-  if not struct:
-    # at this point, we now that the reference sequence from the alignment doesn't match any of the sequences in rnapdb for this pdb_id,
-    # so we can't get the correct structure to plot the pseudo-probing
-    # and mainly because we used different tools to get the structure (rnapdbee) vs to get the sequences (rnaglib)
-    print(f"reference seq differs between rnaglib and rnapdbee {pdb_id},")
-    # anyways, they differ in at most a few nucleotides, so we can either
-    # 1) run the alignment again for the "new sequence"
-    # 2) put some kind of marker in the "not matching nucleotides", so in the plot we see that they differ
-    return 2
-  # print(struct)
+  struct=rows_of_pdbid.iloc[0]['dot_bracket']
+  ref_seq=rows_of_pdbid.iloc[0]['sequence']
   pseudo_probing=[1 if s=="." else 0 for s in list(struct)]
   pseudo_probing=np.array(pseudo_probing)-1.5
 
@@ -68,10 +46,10 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
   # Collect all seqA alignments and compute match frequency per position
   match_counts = [0] * seq_len
   total_seqs = len(rows_of_pdbid)
-  for idx, row in enumerate(rows_of_pdbid):
-    start_alignm, end_alignm = alignment_bounds[idx]
-    seqA = row.get('alignment_seqA')
-    seqB_aligned = row.get('alignment_seqB')
+  for local_idx, (global_idx, row) in enumerate(rows_of_pdbid.iterrows()):
+    start_alignm, end_alignm = alignment_bounds[local_idx]
+    seqA = row.aligned_rnagym_seq
+    seqB_aligned = row.aligned_pdb_seq
     # Map aligned positions to seqB positions
     seqB_pos = 0
     for align_idx in range(start_alignm, min(end_alignm + 1, len(seqA))):
@@ -103,13 +81,19 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
   plt.xlim(-.2, seq_len)
 
   has_seqB_gap = False
-  for idx, row in enumerate(rows_of_pdbid):
-    start_alignm, end_alignm = alignment_bounds[idx]
+
+  structures_idxs=0
+  alpha = .6 if len(rows_of_pdbid) < 20 else .2
+  for local_idx, (global_idx, row) in enumerate(rows_of_pdbid.iterrows()):
+    print(f"Processing row {global_idx} for pdb_id {pdb_id}")
+    if probings_to_plot is not None and global_idx not in probings_to_plot:
+      continue
+    start_alignm, end_alignm = alignment_bounds[local_idx]
     # print(f"align starts at {start_alignm} and ends at {end_alignm}")
     probing=row['reactivity']
     error=row['reactivity_errors']
-    seqA_aligned = row.get('alignment_seqA')
-    seqB_aligned = row.get('alignment_seqB')
+    seqA_aligned = row.aligned_rnagym_seq
+    seqB_aligned = row.aligned_pdb_seq
 
     # Map probing values to seqB positions
     # start_alignm is where seqB starts in the alignment, so it maps to seqB position 0
@@ -148,8 +132,8 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
     probing_clean = probing_slice.copy()
     probing_clean[nan_mask] = 0
 
-    line_color = 'b' if row['experiment_type']=='2A3_MaP' else 'g'
-    plt.plot(x_positions, probing_clean, color=line_color, alpha=.6 )#if pdb_id_counts[pdb_id]<20 else .2)
+    line_color = 'b' if row['experiment']=='2A3_MaP' else 'g'
+    plt.plot(x_positions, probing_clean, color=line_color, alpha=alpha)
     # pearson_coef, p_value = pearsonr(probing_clean[x_positions], np.array([1 if s=="." else 0 for s in list(struct)]))
     # print(f"pearson coef: {pearson_coef}")
     # print(f"p_value: {p_value}")
@@ -163,44 +147,27 @@ def plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, sav
     return 1
   plt.plot(pseudo_probing[0:seq_len],color='black')
 
-  synth_rows=synthetic_probings[synthetic_probings['pdb_id']==pdb_id]
-  from ast import literal_eval
-  for idx, synth in synth_rows.iterrows():
-    # print(type(literal_eval(synth)))
-    numpy_array=np.array(literal_eval(synth['reactivity']))
-    line_color='b' if synth['experiment']=='2A3_MaP' else 'g'
-    plt.plot(numpy_array+4,color=line_color,alpha=0.4)
+  legend_handles = [
+    Line2D([0], [0], color='g', label='DMS'),
+    Line2D([0], [0], color='b', label='2A3'),
+  ]
+  plt.legend(handles=legend_handles)
 
-  plt.title(f'{pdb_id.upper()}')
+  plt.title(f'{pdb_id.upper()} chain {chain}')
   if save_fig:
-    plt.savefig(f"synth_probing_plots/noised_seed3_std.1/{pdb_id}.png")
-  # plt.show()
+    plt.savefig(f"{pdb_id} chain {chain}.png")
+  plt.show()
   print(f"{pdb_id}")
   return 0
 
-# pdb_id='4enc'
-# pdb_ids=synthetic_probings['pdb_id'].unique().tolist()
-grouped_df=synthetic_probings.groupby(['pdb_id','chain'])
+grouped_df=structure_and_probing.groupby(['pdb_id','chain'])
 for (pdb_id, chain), group in grouped_df:
-  rnagym_seqs_aligned_with_pdb_id = rnagym_seqs[rnagym_seqs['pdb_id']==pdb_id].reset_index(drop=True)
-  seen=[]
-  count=0
-  rows_of_pdbid=[]
-  for idx, row in rnagym_seqs_aligned_with_pdb_id.iterrows():
-    if (row['pdb_id'], row['sequence_id'], row['experiment_type']) in seen:
-      continue
-    seen.append((row['pdb_id'], row['sequence_id'], row['experiment_type']))
-    count+=1
-    rows_of_pdbid.append(row)
+  if pdb_id!='1xjr' or chain!='A':
+    continue
 
   # Collect alignment bounds for each row
   alignment_bounds = []
-  for idx,row in enumerate(rows_of_pdbid):
-    # print(f"seq id: {row["sequence_id"]} with experiment {row["experiment_type"]}")
-    start_alignm, end_alignm = find_alignment_bounds(row['alignment_seqB'])
+  for idx,(_,row) in enumerate(group.iterrows()):
+    start_alignm, end_alignm = find_alignment_bounds(row.aligned_pdb_seq)
     alignment_bounds.append((start_alignm, end_alignm))
-      # alignm, start_alignm, end_alignm, draw = compute_alignment_bounds(row['reactivity'], row['sequence'], row['seqB'])
-      # alignment_bounds.append((start_alignm, end_alignm))
-    # if idx == len(rows_of_pdbid)-1:
-    #   print(row['seqB'])
-  plot_probings_and_pseudoprobing(pdb_id, rows_of_pdbid, alignment_bounds, save_fig=True)
+  plot_probings_and_pseudoprobing(pdb_id, group, alignment_bounds, save_fig=True)
