@@ -12,11 +12,18 @@ following the convention used in probing_postprocess.py. reactivity_XXXX
 always has 206 columns (the Ribonanza layout); the list is trimmed down to
 len(sequence) since real sequences here are shorter, with the tail padded
 as the -1000 no-data sentinel.
+
+The whole file is scanned and the n selected rows are drawn with reservoir
+sampling (Algorithm R), so they are a uniform random sample of every row
+that passes the filters, not just the first n found -- unlike taking a fixed
+percentage of each chunk, this needs no estimate of the file's overall
+selectivity to land on an exact count.
 """
 
 import argparse
 import ast
 import csv
+import random
 import sys
 
 import pandas as pd
@@ -41,7 +48,10 @@ def main():
     parser.add_argument("--n", type=int, default=20000, help="number of sequences to extract")
     parser.add_argument("--max-len", type=int, default=512)
     parser.add_argument("--chunksize", type=int, default=50000)
+    parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
+
+    rng = random.Random(args.seed)
 
     excluded_ids = load_excluded_ids(args.structure_and_probing_csv)
     print(f"Loaded {len(excluded_ids)} rnagym_id values to exclude", file=sys.stderr)
@@ -49,58 +59,72 @@ def main():
     usecols = ["sequence_id", "sequence", "experiment_type", "SN_filter"] + REACTIVITY_COLS
 
     n_total = 0
+    n_eligible = 0
     n_dropped_experiment_type = 0
     n_dropped_sn_filter = 0
     n_dropped_length = 0
     n_dropped_excluded_id = 0
-    n_written = 0
+    n_dropped_duplicate_id = 0
+    seen_ids = set()  # sequence_id can repeat in train_data.csv (replicate reads); keep the first
+    reservoir = []  # Algorithm R: uniform sample of size args.n over every eligible row seen so far
+
+    reader = pd.read_csv(args.train_csv, usecols=usecols, chunksize=args.chunksize)
+    for chunk_idx, chunk in enumerate(reader):
+        print(f"Processing chunk {chunk_idx} ({n_eligible} eligible rows seen so far)", file=sys.stderr)
+        n_total += len(chunk)
+
+        before = len(chunk)
+        chunk = chunk[chunk["experiment_type"] == EXPERIMENT_TYPE]
+        n_dropped_experiment_type += before - len(chunk)
+
+        before = len(chunk)
+        chunk = chunk[chunk["SN_filter"] == 1]
+        n_dropped_sn_filter += before - len(chunk)
+
+        before = len(chunk)
+        chunk = chunk[chunk["sequence"].str.len() <= args.max_len]
+        n_dropped_length += before - len(chunk)
+
+        before = len(chunk)
+        chunk = chunk[~chunk["sequence_id"].astype(str).isin(excluded_ids)]
+        n_dropped_excluded_id += before - len(chunk)
+
+        before = len(chunk)
+        chunk = chunk[~chunk["sequence_id"].astype(str).isin(seen_ids)]
+        chunk = chunk.drop_duplicates(subset="sequence_id")
+        n_dropped_duplicate_id += before - len(chunk)
+
+        if chunk.empty:
+            continue
+
+        seen_ids.update(chunk["sequence_id"].astype(str))
+        reactivity_values = chunk[REACTIVITY_COLS].fillna(-1000).values.tolist()
+
+        for (_, row), reactivity in zip(chunk.iterrows(), reactivity_values):
+            reactivity = reactivity[: len(row["sequence"])]
+            item = (row["sequence_id"], row["sequence"], reactivity)
+
+            if len(reservoir) < args.n:
+                reservoir.append(item)
+            else:
+                j = rng.randint(0, n_eligible)
+                if j < args.n:
+                    reservoir[j] = item
+            n_eligible += 1
+
     with open(args.output, "w", newline="") as out_f:
         writer = csv.writer(out_f)
         writer.writerow(["id", "sequence", "reactivity"])
+        writer.writerows(reservoir)
 
-        reader = pd.read_csv(args.train_csv, usecols=usecols, chunksize=args.chunksize)
-        for chunk_idx, chunk in enumerate(reader):
-            print(f"Processing chunk {chunk_idx} ({n_written}/{args.n} selected so far)", file=sys.stderr)
-            n_total += len(chunk)
-
-            before = len(chunk)
-            chunk = chunk[chunk["experiment_type"] == EXPERIMENT_TYPE]
-            n_dropped_experiment_type += before - len(chunk)
-
-            before = len(chunk)
-            chunk = chunk[chunk["SN_filter"] == 1]
-            n_dropped_sn_filter += before - len(chunk)
-
-            before = len(chunk)
-            chunk = chunk[chunk["sequence"].str.len() <= args.max_len]
-            n_dropped_length += before - len(chunk)
-
-            before = len(chunk)
-            chunk = chunk[~chunk["sequence_id"].astype(str).isin(excluded_ids)]
-            n_dropped_excluded_id += before - len(chunk)
-
-            if chunk.empty:
-                continue
-
-            reactivity_values = chunk[REACTIVITY_COLS].fillna(-1000).values.tolist()
-
-            for (_, row), reactivity in zip(chunk.iterrows(), reactivity_values):
-                reactivity = reactivity[: len(row["sequence"])]
-                writer.writerow([row["sequence_id"], row["sequence"], reactivity])
-                n_written += 1
-                if n_written >= args.n:
-                    break
-
-            if n_written >= args.n:
-                break
-
-    n_scanned_not_written = n_total - n_written
     print(f"Rows scanned: {n_total}", file=sys.stderr)
     print(f"  dropped (experiment_type != {EXPERIMENT_TYPE}): {n_dropped_experiment_type}", file=sys.stderr)
     print(f"  dropped (SN_filter != 1): {n_dropped_sn_filter}", file=sys.stderr)
     print(f"  dropped (len(sequence) > {args.max_len}): {n_dropped_length}", file=sys.stderr)
     print(f"  dropped (sequence_id in structure_and_probing.csv): {n_dropped_excluded_id}", file=sys.stderr)
-    print(f"Wrote {n_written} sequences to {args.output}", file=sys.stderr)
+    print(f"  dropped (duplicate sequence_id, already seen): {n_dropped_duplicate_id}", file=sys.stderr)
+    print(f"Eligible rows: {n_eligible}", file=sys.stderr)
+    print(f"Wrote {len(reservoir)} sequences to {args.output}", file=sys.stderr)
 
 
 if __name__ == "__main__":
